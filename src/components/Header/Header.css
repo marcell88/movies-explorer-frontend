@@ -1,0 +1,55 @@
+.header {
+    width: 100%;
+    height: 74px;
+    padding-left: 70px;
+    padding-right: 70px;
+    box-sizing: border-box;
+
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-areas: 'logo nav nav';
+    align-items: center;
+}
+
+.header_location_landing {
+    background-color: #F3C1F8;
+}
+
+.header__logo-button {
+    grid-area: logo;
+    padding: 0;
+    margin: 0;
+    width: 38px;
+    height: 38px;
+
+    border: none;
+    background: none;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    transition: opacity 0.4s;
+}
+
+.header__logo-button:hover {
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+@media screen and (max-width: 1100px) {
+
+    .header {
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+
+}
+
+@media screen and (max-width: 760px) {
+
+    .header {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+}

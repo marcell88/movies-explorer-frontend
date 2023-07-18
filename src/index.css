@@ -1,0 +1,29 @@
+/* Vendors */
+@import url(./vendor/normalize.css);
+
+/* Шрифты */
+@import url(./fonts/fonts.css);
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #FFF;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Inter', Arial, sans-serif;
+}
+
+#root {
+  min-width: 320px;
+  max-width: 1280px;
+  width: 100%;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
