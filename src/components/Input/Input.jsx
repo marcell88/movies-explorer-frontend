@@ -7,7 +7,7 @@ function Input({ inputElement, inputErrorModificator, labelElement, labelText, e
 
     return (
         <label className={`${labelElement}`}>
-            <p className={`${labelElement}-text`}>{labelText}</p>
+            <span className={`${labelElement}-text`}>{labelText}</span>
             <input className={`${inputElement} ${!validity && inputErrorModificator}`}
                 value={value}
                 onChange={onChange}

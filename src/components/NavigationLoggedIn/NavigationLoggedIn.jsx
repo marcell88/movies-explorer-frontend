@@ -39,11 +39,11 @@ function NavigationLoggedIn({ onMoviesClick, onSavedMoviesClick, onProfileClick,
                 ? (
                     <>
                         <ul className='navigation-loggedIn__container navigation-loggedIn__container_location_mid' >
-                            <li className='navigation-loggedIn__item'><button className='navigation-loggedIn__button navigation-loggedIn__button_type_movies' onClick={onMoviesClick}>Фильмы</button></li>
-                            <li className='navigation-loggedIn__item'><button className='navigation-loggedIn__button navigation-loggedIn__button_type_movies' onClick={onSavedMoviesClick}>Сохраненные фильмы</button></li>
+                            <li className='navigation-loggedIn__item'><button className='navigation-loggedIn__button navigation-loggedIn__button_type_movies' type='button' onClick={onMoviesClick}>Фильмы</button></li>
+                            <li className='navigation-loggedIn__item'><button className='navigation-loggedIn__button navigation-loggedIn__button_type_movies' type='button' onClick={onSavedMoviesClick}>Сохраненные фильмы</button></li>
                         </ul>
                         <ul className='navigation-loggedIn__container navigation-loggedIn__container_location_end' >
-                            <li className='navigation-loggedIn__item'><button className='navigation-loggedIn__button navigation-loggedIn__button_type_profile' onClick={onProfileClick}>Аккаунт</button></li>
+                            <li className='navigation-loggedIn__item'><button className='navigation-loggedIn__button navigation-loggedIn__button_type_profile' type='button' onClick={onProfileClick}>Аккаунт</button></li>
                         </ul>
                     </>
                 )
@@ -51,7 +51,7 @@ function NavigationLoggedIn({ onMoviesClick, onSavedMoviesClick, onProfileClick,
                     <>
                         {isMenuOpen && <NavPopup closeMenu={handleButtonMenuClose} onMainClick={onMainClick} onMoviesClick={onMoviesClick} onSavedMoviesClick={onSavedMoviesClick} onProfileClick={onProfileClick} />}
                         < div className='navigation-loggedIn__container navigation-loggedIn__container_location_end'>
-                            <button className='navigation-loggedIn__button navigation-loggedIn__button_type_menu' onClick={handleButtonMenuOpen}></button>
+                            <button className='navigation-loggedIn__button navigation-loggedIn__button_type_menu' type='button' onClick={handleButtonMenuOpen}></button>
                         </div>
                     </>
                 )

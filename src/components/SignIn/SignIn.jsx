@@ -31,7 +31,7 @@ function SignIn({ goToLanding, goToLogin, goToRegistration }) {
     // Render
 
     return (
-        <section className='signin'>
+        <main className='signin'>
 
             <form className='signin__form' noValidate onSubmit={signin}>
                 <div className='signin__form-cont'>
@@ -43,7 +43,7 @@ function SignIn({ goToLanding, goToLogin, goToRegistration }) {
                     >
                         <img className='signin__logo' src={logoPath} alt='Логотип' />
                     </button>
-                    <h2 className='signin__title'>Рады видеть!</h2>
+                    <h1 className='signin__title'>Рады видеть!</h1>
 
                     <Input
                         inputElement='signin__input'
@@ -78,6 +78,8 @@ function SignIn({ goToLanding, goToLogin, goToRegistration }) {
                         name='password'
                         id='input-pass'
                         placeholder='Введите пароль'
+                        minLength='6'
+                        maxLength='30'
                         required
                     />
 
@@ -104,7 +106,7 @@ function SignIn({ goToLanding, goToLogin, goToRegistration }) {
                 </button>
             </div>
 
-        </section>
+        </main>
 
     );
 

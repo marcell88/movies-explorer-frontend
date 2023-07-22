@@ -31,7 +31,7 @@ function SignUp({ goToLanding, goToLogin, goToRegistration }) {
     // Render
 
     return (
-        <section className='signup'>
+        <main className='signup'>
 
             <form className='signup__form' noValidate onSubmit={signup}>
                 <div className='signup__form-cont'>
@@ -43,7 +43,7 @@ function SignUp({ goToLanding, goToLogin, goToRegistration }) {
                     >
                         <img className='signup__logo' src={logoPath} alt='Логотип' />
                     </button>
-                    <h2 className='signup__title'>Добро пожаловать!</h2>
+                    <h1 className='signup__title'>Добро пожаловать!</h1>
 
                     <Input
                         inputElement='signup__input'
@@ -124,7 +124,7 @@ function SignUp({ goToLanding, goToLogin, goToRegistration }) {
                 </button>
             </div>
 
-        </section>
+        </main>
 
     );
 

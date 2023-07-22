@@ -25,29 +25,32 @@ function MoviesCardList({ typeMovieButton, moviesToRender, numberOfInitialMovies
 
     return (
 
-        <section className='gallery'>
+        <div className='gallery'>
 
-            <div className='gallery__container'>
+            <ul className='gallery__container'>
                 {cardsToShow.map(item => (
 
-                    <MoviesCard key={item.movieId}
-                        typeMovieButton={typeMovieButton} //save or delete
-                        isSaved={isMovieSaved(savedMovies, item)}
-                        movie={item}
-                    />
+                    <li className='gallery__card' key={item.movieId}>
+                        <MoviesCard
+                            typeMovieButton={typeMovieButton} //save or delete
+                            isSaved={isMovieSaved(savedMovies, item)}
+                            movie={item}
+                        />
+                    </li>
+
 
                 ))}
-            </div>
+            </ul>
 
             {isMoreButtonShowed && (
-                <button className='gallery__more-button' onClick={showMoreCards} noValidate>Еще</button>
+                <button className='gallery__more-button' type='button' onClick={showMoreCards}>Еще</button>
             )}
 
             {!isMoreButtonShowed && (
                 <div className='gallery__footer'></div>
             )}
 
-        </section>
+        </div>
     );
 }
 

@@ -15,7 +15,7 @@ function InfoPopup({ isOpen, code, msg }) {
                 <img
                     className={'info-popup__image'}
                     src={isSuccess ? success : failed}
-                    alt="success or not"
+                    alt="Успех или неудача"
                 />
                 <h2 className={'info-popup__msg'}>{isSuccess ? '' : msg}</h2>
                 <button className="info-popup__close" type="button" />

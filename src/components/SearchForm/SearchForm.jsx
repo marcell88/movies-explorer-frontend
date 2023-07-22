@@ -1,8 +1,21 @@
+import React from 'react';
+import Input from '../Input/Input';
+
+import { useFormAndValidation } from '../../hooks/useFormAndValidation';
+
 import searchLabel from '../../images/search-label.svg';
 import searchButton from '../../images/search-button.svg';
 import './SearchForm.css';
 
 function SearchForm() {
+
+    // Hooks
+
+    React.useEffect(() => {
+        validation.resetForm();
+    }, []);
+
+    const validation = useFormAndValidation();
 
     // Callbacks
     const onSubmit = (e) => {
@@ -11,15 +24,34 @@ function SearchForm() {
         console.log(e.target.short.checked);
     }
 
+    const handleChange = (e) => {
+        validation.handleChange(e);
+    }
+
     return (
-        <section className='search'>
+        <div className='search'>
 
             <form className='search__form' name='search' onSubmit={onSubmit} noValidate>
 
                 <fieldset className='search__input-container'>
-                    <label className='search__input-label'> <img className='search__input-label-icon' src={searchLabel} alt='Search' /> </label>
-                    <input className='search__input' type='text' name='find' placeholder='Фильм' />
-                    <button className='search__button'> <img className='search__input-button-icon' src={searchButton} alt='Search' /> </button>
+
+                    <label className='search__input-label'>
+                        <img className='search__input-label-icon' src={searchLabel} alt='Искать' />
+                    </label>
+
+                    <input
+                        className='search__input'
+                        onChange={handleChange}
+                        type='text'
+                        name='find'
+                        required={true}
+                        placeholder='Фильм'
+                    />
+
+                    <button className='search__button' type='submit' disabled={!validation.isValid}>
+                        <img className='search__input-button-icon' src={searchButton} alt='Искать' />
+                    </button>
+
                 </fieldset>
 
                 <fieldset className='search__checkbox-container'>
@@ -32,7 +64,7 @@ function SearchForm() {
 
             </form>
 
-        </section>
+        </div>
     );
 }
 

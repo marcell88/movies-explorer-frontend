@@ -5,6 +5,7 @@ import './index.css';
 import App from './components/App/App';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+document.documentElement.lang = 'ru';
 root.render(
   <BrowserRouter><App /></BrowserRouter>
 );

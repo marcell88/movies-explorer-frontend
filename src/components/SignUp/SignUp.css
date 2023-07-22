@@ -1,6 +1,6 @@
 .signup {
     width: 396px;
-    height: 700px;
+    min-height: 700px;
     box-sizing: border-box;
     padding-top: 70px;
     padding-bottom: 70px;
@@ -214,7 +214,7 @@
 @media screen and (max-width: 800px) {
 
     .signup {
-        height: 1024px;
+        min-height: 1024px;
         padding-top: 232px;
         padding-bottom: 232px;
     }
@@ -224,7 +224,7 @@
 @media screen and (max-width: 500px) {
 
     .signup {
-        height: 780px;
+        min-height: 780px;
         padding-top: 56px;
         padding-bottom: 30px;
         width: 260px;

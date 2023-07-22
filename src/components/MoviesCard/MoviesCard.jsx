@@ -36,12 +36,12 @@ function MoviesCard({ typeMovieButton, movie, isSaved }) {
         <div className='card'>
             <div className='card__header'>
                 <div className='card__about'>
-                    <h4 className='card__title'>{movie.nameRU}</h4>
+                    <h2 className='card__title'>{movie.nameRU}</h2>
                     <p className='card__duration'>{durationToString(movie.duration)}</p>
                 </div>
-                <button className={setButtonClass()} noValidate onClick={onClick}></button>
+                <button className={setButtonClass()} type='button' onClick={onClick}></button>
             </div>
-            <a className='card__link' href={movie.trailerLink} target='_blank'><img className='card__image' src={movie.image} alt='Превью фильма' /></a>
+            <a className='card__link' href={movie.trailerLink} target='_blank' rel="noreferrer"><img className='card__image' src={movie.image} alt={movie.nameRU} /></a>
         </div>
     );
 }

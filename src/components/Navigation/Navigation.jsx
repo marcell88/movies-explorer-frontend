@@ -11,8 +11,8 @@ function Navigation({ isLoggedIn, goToLanding, goToLogin, goToRegistration, goTo
         : (
             <nav className='navigation' >
                 <ul className='navigation__container navigation__container_location_end'>
-                    <li className='navigation__item'><button className='navigation__button navigation__button_type_register' onClick={goToRegistration}>Регистрация</button></li>
-                    <li className='navigation__item'><button className='navigation__button navigation__button_type_login' onClick={goToLogin}>Войти</button></li>
+                    <li className='navigation__item'><button className='navigation__button navigation__button_type_register' type='button' onClick={goToRegistration}>Регистрация</button></li>
+                    <li className='navigation__item'><button className='navigation__button navigation__button_type_login' type='button' onClick={goToLogin}>Войти</button></li>
                 </ul>
             </nav>
         )
