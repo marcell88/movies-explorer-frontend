@@ -1,0 +1,80 @@
+.navigation-loggedIn {
+    grid-area: nav;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas: 'nav-mid nav-end';
+    align-items: center;
+}
+
+.navigation-loggedIn__container {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.navigation-loggedIn__container_location_mid {
+    grid-area: nav-mid;
+    display: flex;
+    justify-content: center;
+    column-gap: 16px;
+}
+
+.navigation-loggedIn__container_location_end {
+    grid-area: nav-end;
+    display: flex;
+    justify-content: end;
+    column-gap: 30px;
+}
+
+.navigation-loggedIn__button {
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+    transition: opacity 0.4s;
+}
+
+.navigation-loggedIn__button:hover {
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.navigation-loggedIn__button_type_movies {
+    color: #000;
+    text-align: right;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 18px;
+}
+
+.navigation-loggedIn__button_type_profile {
+    padding: 8px 20px 8px 20px;
+    border-radius: 20px;
+    background: #F9F9F9;
+    color: #000;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 16px;
+}
+
+.navigation-loggedIn__button_type_menu {
+    background-image: url(../../images/menu.svg);
+    width: 44px;
+    height: 44px;
+}
+
+@media screen and (max-width: 760px) {
+
+    .navigation-loggedIn__button_type_menu {
+        width: 37px;
+        height: 40px;
+        margin-right: 4px;
+    }
+
+}

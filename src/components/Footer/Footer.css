@@ -1,0 +1,120 @@
+.footer {
+    width: 100%;
+    padding: 79px 70px 20px 70px;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.footer__container {
+    width: 100%;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.footer__title {
+    width: 100%;
+    margin: 0;
+    padding: 0 0 20px 0;
+    border-bottom: solid 1px #E8E8E8;
+
+    color: #A0A0A0;
+    text-align: center;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.footer__text {
+    padding: 0;
+    margin: 20px 0 0 0;
+
+    color: #000;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.footer__links {
+    margin: 20px 0 0 0;
+    padding: 0;
+    list-style-type: none;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: start;
+    column-gap: 20px;
+}
+
+.footer__link-text {
+    text-decoration: none;
+
+    color: #000;
+    text-align: right;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+
+    transition: opacity 0.4s;
+}
+
+.footer__link-text:hover {
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+
+@media screen and (max-width: 1100px) {
+
+    .footer {
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+
+}
+
+@media screen and (max-width: 760px) {
+
+    .footer {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .footer__title {
+        font-size: 12px;
+    }
+
+    .footer__container {
+        width: 100%;
+        display: flex;
+        flex-direction: column-reverse;
+        justify-content: flex-start;
+        align-items: center;
+    }
+
+    .footer__links {
+        margin-top: 30px;
+        flex-direction: column;
+        align-items: center;
+        row-gap: 8px;
+    }
+
+    .footer__link-text {
+        font-size: 12px;
+    }
+
+    .footer__text {
+        margin-top: 28px;
+    }
+
+}
