@@ -6,7 +6,7 @@ import { useFormAndValidation } from '../../hooks/useFormAndValidation';
 import './SignUp.css';
 import logoPath from '../../images/logo.svg';
 
-function SignUp({ goToLanding, goToLogin, goToRegistration }) {
+function SignUp({ goToLanding, goToLogin, goToRegistration, handleRegister }) {
 
     const validation = useFormAndValidation();
 
@@ -21,7 +21,7 @@ function SignUp({ goToLanding, goToLogin, goToRegistration }) {
 
     const signup = (e) => {
         e.preventDefault();
-        console.log('signup');
+        handleRegister(validation.values['password'], validation.values['email'], validation.values['name']);
     }
 
     const handleChange = (e) => {
@@ -98,6 +98,8 @@ function SignUp({ goToLanding, goToLogin, goToRegistration }) {
                         name='password'
                         id='input-pass'
                         placeholder='Введите пароль'
+                        minLength='6'
+                        maxLength='30'
                         required
                     />
 

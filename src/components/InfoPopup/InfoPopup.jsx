@@ -4,10 +4,14 @@ import failed from '../../images/failed.svg';
 import { usePopupClose } from '../../hooks/usePopupClose';
 import './InfoPopup.css'
 
-function InfoPopup({ isOpen, code, msg }) {
+function InfoPopup({ isOpen, code, msg, handlePopupClose }) {
 
     const isSuccess = code < 300;
-    // usePopupClose(isOpen, onClose);
+    usePopupClose(isOpen, handlePopupClose);
+
+    const onClose = () => {
+        handlePopupClose();
+    }
 
     return isOpen && (
         <div className='info-popup info-popup_opened'>
@@ -18,7 +22,7 @@ function InfoPopup({ isOpen, code, msg }) {
                     alt="Успех или неудача"
                 />
                 <h2 className={'info-popup__msg'}>{isSuccess ? '' : msg}</h2>
-                <button className="info-popup__close" type="button" />
+                <button className="info-popup__close" type="button" onClick={onClose} />
             </div>
         </div>
     )

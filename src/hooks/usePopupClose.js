@@ -9,7 +9,7 @@ export function usePopupClose(isOpen, closePopup) {
     }
 
     const handleOverlay = (event) => {
-        if (event.target.classList.contains("popup_opened")) {
+        if (event.target.classList.contains("info-popup_opened")) {
             closePopup();
         }
     };

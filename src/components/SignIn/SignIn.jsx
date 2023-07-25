@@ -6,7 +6,7 @@ import { useFormAndValidation } from '../../hooks/useFormAndValidation';
 import './SignIn.css';
 import logoPath from '../../images/logo.svg';
 
-function SignIn({ goToLanding, goToLogin, goToRegistration }) {
+function SignIn({ goToLanding, goToLogin, goToRegistration, handleLogin }) {
 
     const validation = useFormAndValidation();
 
@@ -21,7 +21,7 @@ function SignIn({ goToLanding, goToLogin, goToRegistration }) {
 
     const signin = (e) => {
         e.preventDefault();
-        console.log('signin');
+        handleLogin(validation.values['password'], validation.values['email']);
     }
 
     const handleChange = (e) => {

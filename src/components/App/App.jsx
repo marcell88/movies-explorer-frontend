@@ -3,31 +3,37 @@ import React from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 
 import InfoPopup from '../InfoPopup/InfoPopup'
-
 import SignIn from '../SignIn/SignIn';
 import SignUp from '../SignUp/SignUp';
 import Profile from '../Profile/Profile';
 import PageNotFound from '../PageNotFound/PageNotFound';
-
 import SavedMovies from '../SavedMovies/SavedMovies'
 import Movies from '../Movies/Movies';
-
 import Main from '../Main/Main'
 import Footer from '../Footer/Footer'
 import Header from '../Header/Header';
 
-import api from '../../utils/api';
-import { user, TranslationContext } from '../../utils/user';
+import { CurrentUserContext } from '../../contexts/CurrentUserContext';
+
+import MoviesApi from '../../utils/MoviesApi';
+import MainApi from '../../utils/MainApi';
+import * as auth from '../../utils/auth';
 
 import './App.css';
 
 function App() {
 
-  // Hooks
+  // Стейтс
 
   const [isLoggedIn, setLoggedIn] = React.useState(false);
+  const [user, setUser] = React.useState({});
 
   const [isPopupOpen, setPopupOpen] = React.useState(false);
+  const [popup, setPopup] = React.useState({});
+
+  const [moviesApi, setMoviesApi] = React.useState(new MoviesApi());
+  const [mainApi, setMainApi] = React.useState({});
+
   const [isLoading, setLoading] = React.useState(false);
   const [movies, setMovies] = React.useState([]);
   const [savedMovies, setSavedMovies] = React.useState([]);
@@ -36,16 +42,31 @@ function App() {
   const [numberOfInitialMovies, setNumberOfInitialMovies] = React.useState(0);
   const [numberOfMoviesToAdd, setNumberOfMoviesToAdd] = React.useState(0);
 
+  // Скачиваем изначальные фильмы
+
   React.useEffect(() => {
     setLoading(true);
-    api.getInitialCards()
+    moviesApi.getAllMovies()
       .then(movies => {
         setMovies(movies);
-        setSavedMovies(movies.filter((item, index) => index < 5)); // Для верстки считаем первые 5 филдьом - залайканы
       })
-      .catch(err => { console.log(err) })
+      .catch(err => { handlePopupOpen(err) })
       .finally(() => { setLoading(false) });
   }, []);
+
+  React.useEffect(() => {
+    setLoading(true);
+    if (Object.keys(mainApi).length !== 0) {
+      mainApi.getAllSavedMovies()
+        .then(movies => {
+          setSavedMovies(movies);
+        })
+        .catch(err => { handlePopupOpen(err) })
+        .finally(() => { setLoading(false) });
+    }
+  }, [mainApi]);
+
+  // Слушаем размер экрана
 
   React.useEffect(() => {
     const handleResize = () => {
@@ -60,10 +81,84 @@ function App() {
     setNumberOfMoviesToAdd(screenWidth > 1100 ? 3 : 2);
   }, [screenWidth]);
 
-  // Callbacks
+  // Регистрация, авторизация и логуат
+
+  React.useEffect(() => {
+    const jwt = localStorage.getItem('jwt');
+    if (jwt) {
+      setLoading(true);
+      auth.checkToken(jwt)
+        .then(res => {
+          setLoggedIn(true);
+          setUser({ name: res.name, email: res.email });
+          setMainApi(new MainApi(jwt));
+        })
+        .catch(err => {
+          handlePopupOpen(err);
+        })
+        .finally(() => { setLoading(false) })
+    }
+  }, []);
+
+  const handleRegister = (password, email, name) => {
+    setLoading(true);
+    auth.register(password, email, name)
+      .then(res => {
+        localStorage.setItem('jwt', res.token);
+        setLoggedIn(true);
+        setUser({ name, email });
+        navigate('/');
+        setMainApi(new MainApi(res.token));
+      })
+      .catch(err => {
+        handlePopupOpen(err);
+      })
+      .finally(() => { setLoading(false) })
+  }
+
+  const handleLogin = (password, email) => {
+    setLoading(true);
+    auth.authorization(password, email)
+      .then(res => {
+        localStorage.setItem('jwt', res.token);
+        setLoggedIn(true);
+        setMainApi(new MainApi(res.token));
+        return auth.checkToken(res.token);
+      })
+      .then(res => {
+        setUser({ name: res.name, email: res.email });
+        navigate('/');
+      })
+      .catch(err => {
+        handlePopupOpen(err);
+      })
+      .finally(() => { setLoading(false) })
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('jwt');
+    setLoggedIn(false);
+    setMainApi({});
+    navigate('/signin');
+  }
+
+  // Работа с пользователями
 
   const isMovieSaved = (savedMovies, movie) => {
     return savedMovies.filter(item => item.movieId === movie.movieId).length !== 0;
+  }
+
+  const handlePopupOpen = (err) => {
+    setPopupOpen(true);
+    setPopup(err);
+  }
+
+  const handlePopupClose = () => {
+    setPopupOpen(false);
+    setPopup({
+      errorCode: 0,
+      errorMsg: '',
+    })
   }
 
   // Navigation
@@ -109,7 +204,7 @@ function App() {
 
   return (
 
-    <TranslationContext.Provider value={user}>
+    <CurrentUserContext.Provider value={user}>
 
       <div className="page">
 
@@ -185,9 +280,9 @@ function App() {
             />
           } />
 
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/signin" element={<SignIn goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} />} />
-          <Route path="/signup" element={<SignUp goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} />} />
+          <Route path="/profile" element={<Profile handleLogout={handleLogout} />} />
+          <Route path="/signin" element={<SignIn goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} handleLogin={handleLogin} />} />
+          <Route path="/signup" element={<SignUp goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} handleRegister={handleRegister} />} />
           <Route path="*" element={<PageNotFound goBack={goBack} />} />
 
         </Routes>
@@ -203,11 +298,11 @@ function App() {
 
         {/* POPUPS */}
 
-        <InfoPopup isOpen={isPopupOpen} code={401} msg='Forbidden' />
+        <InfoPopup isOpen={isPopupOpen} code={popup.errorCode} msg={`${popup.errorCode}. ${popup.errorMsg}`} handlePopupClose={handlePopupClose} />
 
       </div>
 
-    </TranslationContext.Provider  >
+    </CurrentUserContext.Provider  >
   );
 }
 

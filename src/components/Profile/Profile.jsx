@@ -1,18 +1,18 @@
 import React from 'react';
 
 import Input from '../Input/Input';
-
 import { useFormAndValidation } from '../../hooks/useFormAndValidation';
-import { TranslationContext } from '../../utils/user';
+import { CurrentUserContext } from '../../contexts/CurrentUserContext';
 
 import './Profile.css';
 
-function Profile() {
+function Profile({ handleLogout }) {
 
-    const user = React.useContext(TranslationContext);
-    const validation = useFormAndValidation();
+    const user = React.useContext(CurrentUserContext);
 
     // Hooks
+
+    const validation = useFormAndValidation();
 
     React.useEffect(() => {
         validation.resetForm(true);
@@ -28,7 +28,7 @@ function Profile() {
 
     const logout = (e) => {
         e.preventDefault();
-        console.log('logout');
+        handleLogout();
     }
 
     const handleChange = (e) => {
