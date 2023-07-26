@@ -2,7 +2,7 @@ import React from 'react';
 import MoviesCard from '../MoviesCard/MoviesCard';
 import './MoviesCardList.css';
 
-function MoviesCardList({ typeMovieButton, moviesToRender, numberOfInitialMovies, numberOfMoviesToAdd, isMovieSaved, savedMovies }) {
+function MoviesCardList({ typeMovieButton, moviesToRender, numberOfInitialMovies, numberOfMoviesToAdd, isMovieSaved, savedMovies, handleSaveMovie, handleDeleteMovie }) {
 
     const [numberOfCardsToShow, setNumberOfCardsToShow] = React.useState(numberOfInitialMovies);
     const [cardsToShow, setCardsToShow] = React.useState([]);
@@ -35,6 +35,8 @@ function MoviesCardList({ typeMovieButton, moviesToRender, numberOfInitialMovies
                             typeMovieButton={typeMovieButton} //save or delete
                             isSaved={isMovieSaved(savedMovies, item)}
                             movie={item}
+                            handleSaveMovie={handleSaveMovie}
+                            handleDeleteMovie={handleDeleteMovie}
                         />
                     </li>
 

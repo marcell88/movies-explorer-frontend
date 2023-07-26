@@ -1,7 +1,7 @@
 import React from 'react';
 import './MoviesCard.css';
 
-function MoviesCard({ typeMovieButton, movie, isSaved }) {
+function MoviesCard({ typeMovieButton, movie, isSaved, handleSaveMovie, handleDeleteMovie }) {
 
     // Hooks
 
@@ -30,6 +30,13 @@ function MoviesCard({ typeMovieButton, movie, isSaved }) {
         e.preventDefault();
         setActive(!isActive);
         setButtonClass();
+
+        if (isSaved) {
+            handleDeleteMovie(movie)
+        } else {
+            handleSaveMovie(movie);
+        }
+
     }
 
     return (

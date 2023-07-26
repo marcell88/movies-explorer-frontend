@@ -9,6 +9,8 @@ import logoPath from '../../images/logo.svg';
 function SignIn({ goToLanding, goToLogin, goToRegistration, handleLogin }) {
 
     const validation = useFormAndValidation();
+    const [pass, setPass] = React.useState('');
+    const [email, setEmail] = React.useState('');
 
     // Hooks
 
@@ -21,11 +23,17 @@ function SignIn({ goToLanding, goToLogin, goToRegistration, handleLogin }) {
 
     const signin = (e) => {
         e.preventDefault();
-        handleLogin(validation.values['password'], validation.values['email']);
+        handleLogin(pass, email);
     }
 
-    const handleChange = (e) => {
-        validation.handleChange(e);
+    const handleEmailChange = (evt) => {
+        setEmail(evt.target.value);
+        validation.handleChange(evt);
+    }
+
+    const handlePassChange = (evt) => {
+        setPass(evt.target.value);
+        validation.handleChange(evt);
     }
 
     // Render
@@ -51,11 +59,11 @@ function SignIn({ goToLanding, goToLogin, goToRegistration, handleLogin }) {
                         labelElement='signin__label'
                         labelText='E-mail'
                         errorElement='signin__error'
-                        defaultValue=''
+                        value={email}
                         isFormValid={validation.isValid}
                         isInputValid={validation.errorFlags['email'] || validation.errorFlags['email'] === undefined}
                         errorText={validation.errors['email']}
-                        onChange={handleChange}
+                        onChange={handleEmailChange}
                         type='email'
                         name='email'
                         id='input-email'
@@ -69,11 +77,11 @@ function SignIn({ goToLanding, goToLogin, goToRegistration, handleLogin }) {
                         labelElement='signin__label'
                         labelText='Пароль'
                         errorElement='signin__error'
-                        defaultValue=''
+                        value={pass}
                         isFormValid={validation.isValid}
                         isInputValid={validation.errorFlags['password'] || validation.errorFlags['password'] === undefined}
                         errorText={validation.errors['password']}
-                        onChange={handleChange}
+                        onChange={handlePassChange}
                         type='password'
                         name='password'
                         id='input-pass'

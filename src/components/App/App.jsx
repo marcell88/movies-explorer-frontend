@@ -2,7 +2,8 @@
 import React from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 
-import InfoPopup from '../InfoPopup/InfoPopup'
+import InfoPopup from '../InfoPopup/InfoPopup';
+import LoadingPopup from '../LoadingPopup/LoadingPopup';
 import SignIn from '../SignIn/SignIn';
 import SignUp from '../SignUp/SignUp';
 import Profile from '../Profile/Profile';
@@ -52,11 +53,11 @@ function App() {
       })
       .catch(err => { handlePopupOpen(err) })
       .finally(() => { setLoading(false) });
-  }, []);
+  }, [moviesApi]);
 
   React.useEffect(() => {
-    setLoading(true);
-    if (Object.keys(mainApi).length !== 0) {
+    if (Object.keys(mainApi).length > 0) {
+      setLoading(true);
       mainApi.getAllSavedMovies()
         .then(movies => {
           setSavedMovies(movies);
@@ -81,7 +82,7 @@ function App() {
     setNumberOfMoviesToAdd(screenWidth > 1100 ? 3 : 2);
   }, [screenWidth]);
 
-  // Регистрация, авторизация и логуат
+  // Работа с пользователем
 
   React.useEffect(() => {
     const jwt = localStorage.getItem('jwt');
@@ -137,12 +138,44 @@ function App() {
 
   const handleLogout = () => {
     localStorage.removeItem('jwt');
+    setUser({});
     setLoggedIn(false);
     setMainApi({});
     navigate('/signin');
   }
 
-  // Работа с пользователями
+  const handleProfileUpdate = (name, email) => {
+    setLoading(true);
+    mainApi.updateProfile(name, email)
+      .then(res => setUser({ name: res.name, email: res.email }))
+      .catch(err => {
+        handlePopupOpen(err);
+      })
+      .finally(() => { setLoading(false) })
+  }
+
+  // Работа с фильмами
+
+  const handleSaveMovie = async (movie) => {
+    try {
+      const newSavedMovie = await mainApi.saveMovie(movie);
+      const newSavedMovies = await mainApi.getAllSavedMovies();
+      setSavedMovies(newSavedMovies);
+    } catch (err) {
+      handlePopupOpen(err)
+    }
+  }
+
+  const handleDeleteMovie = async (movie) => {
+    const _id = savedMovies.find(savedMovie => savedMovie.movieId === movie.movieId)._id;
+    try {
+      const responseForDelete = await mainApi.deleteMovie(_id);
+      const newSavedMovies = await mainApi.getAllSavedMovies();
+      setSavedMovies(newSavedMovies);
+    } catch (err) {
+      handlePopupOpen(err)
+    }
+  }
 
   const isMovieSaved = (savedMovies, movie) => {
     return savedMovies.filter(item => item.movieId === movie.movieId).length !== 0;
@@ -260,27 +293,30 @@ function App() {
 
           <Route path="/movies" element={
             <Movies
-              movies={movies}
               isLoading={isLoading}
+              movies={movies}
               savedMovies={savedMovies}
               isMovieSaved={isMovieSaved}
               numberOfInitialMovies={numberOfInitialMovies}
               numberOfMoviesToAdd={numberOfMoviesToAdd}
+              handleSaveMovie={handleSaveMovie}
+              handleDeleteMovie={handleDeleteMovie}
             />
           } />
 
           <Route path="/saved-movies" element={
             <SavedMovies
-              movies={movies}
               isLoading={isLoading}
+              movies={movies}
               savedMovies={savedMovies}
               isMovieSaved={isMovieSaved}
               numberOfInitialMovies={numberOfInitialMovies}
               numberOfMoviesToAdd={numberOfMoviesToAdd}
+              handleDeleteMovie={handleDeleteMovie}
             />
           } />
 
-          <Route path="/profile" element={<Profile handleLogout={handleLogout} />} />
+          <Route path="/profile" element={<Profile handleProfileUpdate={handleProfileUpdate} handleLogout={handleLogout} />} />
           <Route path="/signin" element={<SignIn goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} handleLogin={handleLogin} />} />
           <Route path="/signup" element={<SignUp goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} handleRegister={handleRegister} />} />
           <Route path="*" element={<PageNotFound goBack={goBack} />} />
@@ -299,6 +335,8 @@ function App() {
         {/* POPUPS */}
 
         <InfoPopup isOpen={isPopupOpen} code={popup.errorCode} msg={`${popup.errorCode}. ${popup.errorMsg}`} handlePopupClose={handlePopupClose} />
+
+        <LoadingPopup isOpen={isLoading} />
 
       </div>
 

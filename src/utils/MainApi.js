@@ -7,29 +7,41 @@ export default class MainApi {
         this._token = token;
     }
 
-    _statusCheck(res, str = '') {
-        return res.ok
-            ? res.json()
-            : Promise.reject(`>>>> Ошибка - ${str}: ${res.status}`);
-    }
+    async _makeRequest(endpoint, method, body, token) {
 
-    async getAllSavedMovies() {
-
-        const res = await fetch(SERVER_BASE_URL + '/movies', {
-            method: 'GET',
+        const option = {
+            method,
             headers: {
-                'Content-Type': 'application/json',
-                authorization: `Bearer ${this._token}`
-            },
-        });
+                'Content-Type': 'application/json'
+            }
+        }
 
-        const body = await res.json();
+        if (body) option.body = JSON.stringify(body);
+        if (token) option.headers.Authorization = `Bearer ${token}`;
+
+        const res = await fetch(`${this._baseUrl}${endpoint}`, option);
+        const data = await res.json();
 
         return res.ok
-            ? body
-            : Promise.reject({ errorCode: res.status, errorMsg: body.message })
+            ? data
+            : Promise.reject({ errorCode: res.status, errorMsg: data.message });
 
     }
 
+    getAllSavedMovies() {
+        return this._makeRequest('/movies', 'GET', null, this._token);
+    }
+
+    updateProfile(name, email) {
+        return this._makeRequest('/users/me', 'PATCH', { name, email }, this._token);
+    }
+
+    saveMovie(movie) {
+        return this._makeRequest('/movies', 'POST', movie, this._token);
+    }
+
+    deleteMovie(id) {
+        return this._makeRequest('/movies' + '/' + id, 'DELETE', null, this._token);
+    }
 
 }
