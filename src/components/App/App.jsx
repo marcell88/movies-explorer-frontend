@@ -172,6 +172,7 @@ function App() {
       const responseForDelete = await mainApi.deleteMovie(_id);
       const newSavedMovies = await mainApi.getAllSavedMovies();
       setSavedMovies(newSavedMovies);
+      console.log(savedMovies);
     } catch (err) {
       handlePopupOpen(err)
     }

@@ -1,3 +1,13 @@
+@keyframes rotation-animation {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 .card {
     box-sizing: border-box;
     height: 271px;
@@ -79,6 +89,10 @@
 .card__delete:hover {
     cursor: pointer;
     background-color: rgba(200, 200, 200, 1);
+}
+
+.card__delete_deleting {
+    animation: rotation-animation 2s linear infinite;
 }
 
 .card__link {

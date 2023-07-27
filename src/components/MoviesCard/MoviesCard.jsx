@@ -6,6 +6,7 @@ function MoviesCard({ typeMovieButton, movie, isSaved, handleSaveMovie, handleDe
     // Hooks
 
     const [isActive, setActive] = React.useState(isSaved);
+    const [isDeleting, setDeleting] = React.useState(false);
 
     // Callbacks
 
@@ -16,27 +17,25 @@ function MoviesCard({ typeMovieButton, movie, isSaved, handleSaveMovie, handleDe
     }
 
     const setButtonClass = () => {
-
-        // if typeMovieButton - delete
-        if (typeMovieButton === 'delete') {
-            return 'card__delete';
-        }
-
-        // if typeMovieButton - select
-        return `card__save ${isActive && 'card__save_active'}`;
+        const modificatorForSave = `${isActive && 'card__save_active'}`;
+        const modificatorForDelete = `${isDeleting && 'card__delete_deleting'}`;
+        return typeMovieButton === 'delete' ? 'card__delete ' + modificatorForDelete : 'card__save ' + modificatorForSave;
     }
 
-    const onClick = (e) => {
+    const saveCard = async (e) => {
         e.preventDefault();
         setActive(!isActive);
         setButtonClass();
+        await handleSaveMovie(movie);
+    }
 
-        if (isSaved) {
-            handleDeleteMovie(movie)
-        } else {
-            handleSaveMovie(movie);
-        }
-
+    const deleteCard = async (e) => {
+        e.preventDefault();
+        setDeleting(true);
+        setActive(!isActive);
+        setButtonClass();
+        await handleDeleteMovie(movie);
+        setDeleting(false);
     }
 
     return (
@@ -46,7 +45,7 @@ function MoviesCard({ typeMovieButton, movie, isSaved, handleSaveMovie, handleDe
                     <h2 className='card__title'>{movie.nameRU}</h2>
                     <p className='card__duration'>{durationToString(movie.duration)}</p>
                 </div>
-                <button className={setButtonClass()} type='button' onClick={onClick}></button>
+                <button className={setButtonClass()} type='button' onClick={isSaved ? deleteCard : saveCard}></button>
             </div>
             <a className='card__link' href={movie.trailerLink} target='_blank' rel="noreferrer"><img className='card__image' src={movie.image} alt={movie.nameRU} /></a>
         </div>
