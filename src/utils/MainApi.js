@@ -28,6 +28,11 @@ export default class MainApi {
 
     }
 
+    getUserInfo() {
+        return this._makeRequest('/users/me', 'GET', null, this._token);
+    }
+
+
     getAllSavedMovies() {
         return this._makeRequest('/movies', 'GET', null, this._token);
     }

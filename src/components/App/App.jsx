@@ -13,10 +13,11 @@ import Movies from '../Movies/Movies';
 import Main from '../Main/Main'
 import Footer from '../Footer/Footer'
 import Header from '../Header/Header';
+import ProtectedRouteElement from '../ProtectedRouteElement/ProotectedRouteElement';
 
 import { CurrentUserContext } from '../../contexts/CurrentUserContext';
 
-import MoviesApi from '../../utils/MoviesApi';
+import moviesApi from '../../utils/MoviesApi';
 import MainApi from '../../utils/MainApi';
 import * as auth from '../../utils/auth';
 
@@ -32,40 +33,78 @@ function App() {
   const [isPopupOpen, setPopupOpen] = React.useState(false);
   const [popup, setPopup] = React.useState({});
 
-  const [moviesApi, setMoviesApi] = React.useState(new MoviesApi());
   const [mainApi, setMainApi] = React.useState({});
 
   const [isLoading, setLoading] = React.useState(false);
+
   const [movies, setMovies] = React.useState([]);
+
   const [savedMovies, setSavedMovies] = React.useState([]);
+  const [lengthOfSavedMoovies, setLengthOfSavedMoovies] = React.useState(0);
 
   const [screenWidth, setScreenWidth] = React.useState(window.innerWidth);
   const [numberOfInitialMovies, setNumberOfInitialMovies] = React.useState(0);
   const [numberOfMoviesToAdd, setNumberOfMoviesToAdd] = React.useState(0);
 
-  // Скачиваем изначальные фильмы
+  // Скачиваем изначальные фильмы и данные пользователя
 
-  React.useEffect(() => {
-    setLoading(true);
-    moviesApi.getAllMovies()
-      .then(movies => {
-        setMovies(movies);
-      })
-      .catch(err => { handlePopupOpen(err) })
-      .finally(() => { setLoading(false) });
-  }, [moviesApi]);
-
-  React.useEffect(() => {
-    if (Object.keys(mainApi).length > 0) {
-      setLoading(true);
-      mainApi.getAllSavedMovies()
-        .then(movies => {
-          setSavedMovies(movies);
-        })
-        .catch(err => { handlePopupOpen(err) })
-        .finally(() => { setLoading(false) });
+  const fetchUserData = async (setLoadingState) => {
+    try {
+      setLoadingState(true);
+      const jwt = localStorage.getItem('jwt');
+      if (jwt) {
+        const user = await auth.checkToken(jwt);
+        setLoggedIn(true);
+        setUser(user);
+        setMainApi(new MainApi(jwt));
+      }
+    } catch (err) {
+      handlePopupOpen(err);
+    } finally {
+      setLoadingState(false);
     }
+  }
+
+  const fetchMovies = async (setLoadingState) => {
+    try {
+      setLoadingState(true);
+      const movies = await moviesApi.getAllMovies();
+      setMovies(movies);
+    } catch (err) {
+      handlePopupOpen(err);
+    } finally {
+      setLoadingState(false);
+    }
+  }
+
+  const fetchSavedMovies = async (setLoadingState) => {
+    try {
+      setLoadingState(true);
+      if (Object.keys(mainApi).length > 0) {
+        const savedMovies = await mainApi.getAllSavedMovies();
+        setSavedMovies(savedMovies);
+      }
+    } catch (err) {
+      handlePopupOpen(err);
+    } finally {
+      setLoadingState(false);
+    }
+  }
+
+  React.useEffect(() => {
+    fetchUserData(setLoading);
+    fetchMovies(setLoading);
+  }, []);
+
+  React.useEffect(() => {
+    fetchSavedMovies(setLoading);
   }, [mainApi]);
+
+  /*
+  React.useEffect(() => {
+    fetchSavedMovies(setLoading);
+  }, [lengthOfSavedMoovies]);
+  */
 
   // Слушаем размер экрана
 
@@ -83,23 +122,6 @@ function App() {
   }, [screenWidth]);
 
   // Работа с пользователем
-
-  React.useEffect(() => {
-    const jwt = localStorage.getItem('jwt');
-    if (jwt) {
-      setLoading(true);
-      auth.checkToken(jwt)
-        .then(res => {
-          setLoggedIn(true);
-          setUser({ name: res.name, email: res.email });
-          setMainApi(new MainApi(jwt));
-        })
-        .catch(err => {
-          handlePopupOpen(err);
-        })
-        .finally(() => { setLoading(false) })
-    }
-  }, []);
 
   const handleRegister = (password, email, name) => {
     setLoading(true);
@@ -158,29 +180,32 @@ function App() {
 
   const handleSaveMovie = async (movie) => {
     try {
-      const newSavedMovie = await mainApi.saveMovie(movie);
-      const newSavedMovies = await mainApi.getAllSavedMovies();
-      setSavedMovies(newSavedMovies);
+      const newSavedMoovie = await mainApi.saveMovie(movie);
+      setSavedMovies([...savedMovies, newSavedMoovie].sort((a, b) => a.movieId - b.movieId));
     } catch (err) {
       handlePopupOpen(err)
+    } finally {
+      setLengthOfSavedMoovies(lengthOfSavedMoovies + 1);
     }
   }
 
   const handleDeleteMovie = async (movie) => {
     const _id = savedMovies.find(savedMovie => savedMovie.movieId === movie.movieId)._id;
     try {
-      const responseForDelete = await mainApi.deleteMovie(_id);
-      const newSavedMovies = await mainApi.getAllSavedMovies();
-      setSavedMovies(newSavedMovies);
-      console.log(savedMovies);
+      await mainApi.deleteMovie(_id);
+      setSavedMovies(savedMovies.filter(savedMovie => savedMovie.movieId !== movie.movieId));
     } catch (err) {
       handlePopupOpen(err)
+    } finally {
+      setLengthOfSavedMoovies(lengthOfSavedMoovies - 1);
     }
   }
 
   const isMovieSaved = (savedMovies, movie) => {
     return savedMovies.filter(item => item.movieId === movie.movieId).length !== 0;
   }
+
+  // Попап с ошибкой
 
   const handlePopupOpen = (err) => {
     setPopupOpen(true);
@@ -339,9 +364,9 @@ function App() {
 
         <LoadingPopup isOpen={isLoading} />
 
-      </div>
+      </div >
 
-    </CurrentUserContext.Provider  >
+    </CurrentUserContext.Provider >
   );
 }
 

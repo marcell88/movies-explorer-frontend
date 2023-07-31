@@ -6,7 +6,7 @@ function MoviesCard({ typeMovieButton, movie, isSaved, handleSaveMovie, handleDe
     // Hooks
 
     const [isActive, setActive] = React.useState(isSaved);
-    const [isDeleting, setDeleting] = React.useState(false);
+    const [isUpdating, setUpdating] = React.useState(false);
 
     // Callbacks
 
@@ -17,25 +17,27 @@ function MoviesCard({ typeMovieButton, movie, isSaved, handleSaveMovie, handleDe
     }
 
     const setButtonClass = () => {
-        const modificatorForSave = `${isActive && 'card__save_active'}`;
-        const modificatorForDelete = `${isDeleting && 'card__delete_deleting'}`;
-        return typeMovieButton === 'delete' ? 'card__delete ' + modificatorForDelete : 'card__save ' + modificatorForSave;
+        const modificatorIsCardSelected = `${isActive && 'card__save_active'}`;
+        const modificatorIsCardUpdating = `${isUpdating && 'card-updating'}`;
+        return typeMovieButton === 'delete' ? 'card__delete ' + modificatorIsCardUpdating : 'card__save' + ' ' + modificatorIsCardSelected + ' ' + modificatorIsCardUpdating;
     }
 
     const saveCard = async (e) => {
         e.preventDefault();
+        setUpdating(true);
         setActive(!isActive);
         setButtonClass();
         await handleSaveMovie(movie);
+        setUpdating(false);
     }
 
     const deleteCard = async (e) => {
         e.preventDefault();
-        setDeleting(true);
+        setUpdating(true);
         setActive(!isActive);
         setButtonClass();
         await handleDeleteMovie(movie);
-        setDeleting(false);
+        setUpdating(false);
     }
 
     return (

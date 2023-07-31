@@ -6,8 +6,6 @@ import './SavedMovies.css';
 
 function SavedMovies({ movies, isLoading, savedMovies, isMovieSaved, numberOfInitialMovies, numberOfMoviesToAdd, handleDeleteMovie }) {
 
-    // Render
-
     return (
         <main className='movies'>
             <SearchForm />

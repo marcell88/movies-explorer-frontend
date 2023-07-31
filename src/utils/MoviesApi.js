@@ -1,7 +1,7 @@
 import { SERVER_EXT_BASE_URL } from './server';
 import { SERVER_BASE_URL } from './server';
 
-export default class MoviesApi {
+class MoviesApi {
 
     async getAllMovies() {
 
@@ -35,3 +35,7 @@ export default class MoviesApi {
 
     }
 }
+
+const moviesApi = new MoviesApi();
+
+export default moviesApi;
