@@ -6,6 +6,7 @@ function MoviesCardList({ typeMovieButton, moviesToRender, numberOfInitialMovies
 
     const [numberOfCardsToShow, setNumberOfCardsToShow] = React.useState(numberOfInitialMovies);
     const [cardsToShow, setCardsToShow] = React.useState([]);
+    const [savedMoviesToRender, setSavedMoviesToRender] = React.useState([]);
     const [isMoreButtonShowed, setMoreButtonShowed] = React.useState(true);
 
     // Hooks
@@ -13,7 +14,11 @@ function MoviesCardList({ typeMovieButton, moviesToRender, numberOfInitialMovies
     React.useEffect(() => {
         setCardsToShow(moviesToRender.filter((item, index) => index < numberOfCardsToShow));
         setMoreButtonShowed(numberOfCardsToShow < moviesToRender.length);
-    }, []);
+    }, [moviesToRender]);
+
+    React.useEffect(() => {
+        setSavedMoviesToRender([...savedMovies])
+    }, [savedMovies]);
 
     // Callbacks
 
@@ -33,7 +38,7 @@ function MoviesCardList({ typeMovieButton, moviesToRender, numberOfInitialMovies
                     <li className='gallery__card' key={item.movieId}>
                         <MoviesCard
                             typeMovieButton={typeMovieButton} //save or delete
-                            isSaved={isMovieSaved(savedMovies, item)}
+                            isSaved={isMovieSaved(savedMoviesToRender, item)}
                             movie={item}
                             handleSaveMovie={handleSaveMovie}
                             handleDeleteMovie={handleDeleteMovie}

@@ -40,7 +40,6 @@ function App() {
   const [movies, setMovies] = React.useState([]);
 
   const [savedMovies, setSavedMovies] = React.useState([]);
-  const [lengthOfSavedMoovies, setLengthOfSavedMoovies] = React.useState(0);
 
   const [screenWidth, setScreenWidth] = React.useState(window.innerWidth);
   const [numberOfInitialMovies, setNumberOfInitialMovies] = React.useState(0);
@@ -48,63 +47,61 @@ function App() {
 
   // Скачиваем изначальные фильмы и данные пользователя
 
-  const fetchUserData = async (setLoadingState) => {
+  const fetchMovies = async () => {
+    const movies = await moviesApi.getAllMovies();
+    return movies;
+  }
+
+  const fetchUser = async (jwt) => {
+    const user = await auth.checkToken(jwt);
+    const mainApi = new MainApi(jwt);
+    return { user, mainApi };
+  }
+
+  const fetchSavedMovies = async (mainApi) => {
+    const savedMovies = await mainApi.getAllSavedMovies();
+    return savedMovies;
+  }
+
+  const getAllMovies = async () => {
     try {
-      setLoadingState(true);
+      setLoading(true);
+      const movies = await fetchMovies();
+      setMovies(movies)
+    } catch (err) {
+      handlePopupOpen(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const getUserSpecificData = async () => {
+    try {
+      setLoading(true);
       const jwt = localStorage.getItem('jwt');
       if (jwt) {
-        const user = await auth.checkToken(jwt);
-        setLoggedIn(true);
-        setUser(user);
-        setMainApi(new MainApi(jwt));
+        const { user, mainApi } = await fetchUser(jwt);
+
+        if (mainApi && user) {
+          setLoggedIn(true);
+          setUser(user);
+          setMainApi(mainApi);
+
+          const savedMovies = await fetchSavedMovies(mainApi);
+          setSavedMovies(savedMovies);
+        }
       }
     } catch (err) {
       handlePopupOpen(err);
     } finally {
-      setLoadingState(false);
-    }
-  }
-
-  const fetchMovies = async (setLoadingState) => {
-    try {
-      setLoadingState(true);
-      const movies = await moviesApi.getAllMovies();
-      setMovies(movies);
-    } catch (err) {
-      handlePopupOpen(err);
-    } finally {
-      setLoadingState(false);
-    }
-  }
-
-  const fetchSavedMovies = async (setLoadingState) => {
-    try {
-      setLoadingState(true);
-      if (Object.keys(mainApi).length > 0) {
-        const savedMovies = await mainApi.getAllSavedMovies();
-        setSavedMovies(savedMovies);
-      }
-    } catch (err) {
-      handlePopupOpen(err);
-    } finally {
-      setLoadingState(false);
+      setLoading(false);
     }
   }
 
   React.useEffect(() => {
-    fetchUserData(setLoading);
-    fetchMovies(setLoading);
+    getAllMovies();
+    getUserSpecificData();
   }, []);
-
-  React.useEffect(() => {
-    fetchSavedMovies(setLoading);
-  }, [mainApi]);
-
-  /*
-  React.useEffect(() => {
-    fetchSavedMovies(setLoading);
-  }, [lengthOfSavedMoovies]);
-  */
 
   // Слушаем размер экрана
 
@@ -123,39 +120,32 @@ function App() {
 
   // Работа с пользователем
 
-  const handleRegister = (password, email, name) => {
-    setLoading(true);
-    auth.register(password, email, name)
-      .then(res => {
-        localStorage.setItem('jwt', res.token);
-        setLoggedIn(true);
-        setUser({ name, email });
-        navigate('/');
-        setMainApi(new MainApi(res.token));
-      })
-      .catch(err => {
-        handlePopupOpen(err);
-      })
-      .finally(() => { setLoading(false) })
+  const handleRegister = async (password, email, name) => {
+    try {
+      setLoading(true);
+      const { token } = await auth.register(password, email, name);
+      localStorage.setItem('jwt', token);
+    } catch (err) {
+      handlePopupOpen(err);
+    } finally {
+      setLoading(false);
+    }
+    getUserSpecificData();
+    navigate('/');
   }
 
-  const handleLogin = (password, email) => {
-    setLoading(true);
-    auth.authorization(password, email)
-      .then(res => {
-        localStorage.setItem('jwt', res.token);
-        setLoggedIn(true);
-        setMainApi(new MainApi(res.token));
-        return auth.checkToken(res.token);
-      })
-      .then(res => {
-        setUser({ name: res.name, email: res.email });
-        navigate('/');
-      })
-      .catch(err => {
-        handlePopupOpen(err);
-      })
-      .finally(() => { setLoading(false) })
+  const handleLogin = async (password, email) => {
+    try {
+      setLoading(true);
+      const { token } = await auth.authorization(password, email);
+      localStorage.setItem('jwt', token);
+    } catch (err) {
+      handlePopupOpen(err);
+    } finally {
+      setLoading(false);
+    }
+    getUserSpecificData();
+    navigate('/');
   }
 
   const handleLogout = () => {
@@ -184,8 +174,6 @@ function App() {
       setSavedMovies([...savedMovies, newSavedMoovie].sort((a, b) => a.movieId - b.movieId));
     } catch (err) {
       handlePopupOpen(err)
-    } finally {
-      setLengthOfSavedMoovies(lengthOfSavedMoovies + 1);
     }
   }
 
@@ -196,14 +184,16 @@ function App() {
       setSavedMovies(savedMovies.filter(savedMovie => savedMovie.movieId !== movie.movieId));
     } catch (err) {
       handlePopupOpen(err)
-    } finally {
-      setLengthOfSavedMoovies(lengthOfSavedMoovies - 1);
     }
   }
 
   const isMovieSaved = (savedMovies, movie) => {
     return savedMovies.filter(item => item.movieId === movie.movieId).length !== 0;
   }
+
+  // Работа с поиском
+
+
 
   // Попап с ошибкой
 

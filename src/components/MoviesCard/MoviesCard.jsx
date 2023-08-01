@@ -5,8 +5,12 @@ function MoviesCard({ typeMovieButton, movie, isSaved, handleSaveMovie, handleDe
 
     // Hooks
 
-    const [isActive, setActive] = React.useState(isSaved);
+    const [isActive, setActive] = React.useState(false);
     const [isUpdating, setUpdating] = React.useState(false);
+
+    React.useEffect(() => {
+        setActive(isSaved);
+    }, [isSaved]);
 
     // Callbacks
 

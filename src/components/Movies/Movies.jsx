@@ -6,14 +6,20 @@ import './Movies.css';
 
 function Movies({ isLoading, movies, savedMovies, isMovieSaved, numberOfInitialMovies, numberOfMoviesToAdd, handleSaveMovie, handleDeleteMovie }) {
 
+    const [moviesToRender, setMoviesToRender] = React.useState([]);
+
+    React.useEffect(() => {
+        setMoviesToRender([...movies]);
+    }, [movies]);
+
     // Render
 
     return (
         <main className='movies'>
             <SearchForm />
-            {!isLoading && (<MoviesCardList
+            {!isLoading && (moviesToRender.length !== 0) && (<MoviesCardList
                 typeMovieButton='save'
-                moviesToRender={movies}
+                moviesToRender={moviesToRender}
 
                 numberOfInitialMovies={numberOfInitialMovies}
                 numberOfMoviesToAdd={numberOfMoviesToAdd}
