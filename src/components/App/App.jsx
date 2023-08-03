@@ -121,6 +121,8 @@ function App() {
       setLoading(true);
       const { token } = await auth.register(password, email, name);
       localStorage.setItem('jwt', token);
+      localStorage.setItem('req', '');
+      localStorage.setItem('checkbox', 'all');
     } catch (err) {
       handlePopupOpen(err);
     } finally {
@@ -150,7 +152,6 @@ function App() {
     localStorage.removeItem('jwt');
     localStorage.removeItem('req');
     localStorage.removeItem('checkbox');
-
     setUser({});
     setLoggedIn(false);
     setMainApi({});

@@ -26,7 +26,6 @@ function Movies({ isLoading, movies, savedMovies, isMovieSaved, numberOfInitialM
         else {
             setEmpty(false);
         }
-
     }, [movies, request, isShortMoviesOnly]);
 
     const handleSubmit = async (req, checkbox) => {
