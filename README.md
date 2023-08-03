@@ -18,3 +18,4 @@
 * Ссылка на макет проекта: https://disk.yandex.com/d/1Y6rIy4Py8Wpsg
 * Ссылка на сайт: https://themovies.nomoreparties.sbs
 * Ссылка на api: https://api.themovies.nomoreparties.sbs
+* Ссылка на пул-реквест: https://github.com/marcell88/movies-explorer-frontend/pull/2
