@@ -2,6 +2,7 @@ import React from 'react';
 import Input from '../Input/Input';
 
 import { useFormAndValidation } from '../../hooks/useFormAndValidation';
+import { emailRegExp } from '../../utils/constants';
 
 import './SignIn.css';
 import logoPath from '../../images/logo.svg';
@@ -68,6 +69,7 @@ function SignIn({ goToLanding, goToLogin, goToRegistration, handleLogin }) {
                         name='email'
                         id='input-email'
                         placeholder='Введите почту'
+                        pattern={emailRegExp}
                         required
                     />
 

@@ -1,4 +1,4 @@
-import { SERVER_BASE_URL } from './server';
+import { SERVER_BASE_URL } from './constants';
 
 export default class MainApi {
 

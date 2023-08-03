@@ -4,6 +4,8 @@ import Input from '../Input/Input';
 import { useFormAndValidation } from '../../hooks/useFormAndValidation';
 import { CurrentUserContext } from '../../contexts/CurrentUserContext';
 
+import { emailRegExp } from '../../utils/constants';
+
 import './Profile.css';
 
 function Profile({ handleProfileUpdate, handleLogout }) {
@@ -88,6 +90,7 @@ function Profile({ handleProfileUpdate, handleLogout }) {
                     name='email'
                     id='input-email'
                     placeholder='Введите почту'
+                    pattern={emailRegExp}
                     required
                 />
 

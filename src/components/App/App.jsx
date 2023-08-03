@@ -74,7 +74,6 @@ function App() {
   const getUserSpecificData = async () => {
     try {
       setLoading(true);
-      setRedirectionActivated(true);
       const jwt = localStorage.getItem('jwt');
       if (jwt) {
         const { user, mainApi } = await fetchUser(jwt);
@@ -82,7 +81,7 @@ function App() {
           setUser(user);
           setMainApi(mainApi);
           setLoggedIn(true);
-
+          setRedirectionActivated(true);
           const savedMovies = await fetchSavedMovies(mainApi);
           setSavedMovies(savedMovies);
         }

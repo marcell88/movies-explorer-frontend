@@ -1,4 +1,4 @@
-import { SERVER_BASE_URL } from './server.js'
+import { SERVER_BASE_URL } from './constants.js'
 
 const makeRequest = async (endpoint, method, body, token) => {
 

@@ -2,6 +2,8 @@ import React from 'react';
 import Input from '../Input/Input';
 
 import { useFormAndValidation } from '../../hooks/useFormAndValidation';
+import { emailRegExp } from '../../utils/constants';
+
 
 import './SignUp.css';
 import logoPath from '../../images/logo.svg';
@@ -94,6 +96,7 @@ function SignUp({ goToLanding, goToLogin, goToRegistration, handleRegister }) {
                         name='email'
                         id='input-email'
                         placeholder='Введите почту'
+                        pattern={emailRegExp}
                         required
                     />
 
