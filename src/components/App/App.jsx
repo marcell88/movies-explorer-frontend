@@ -65,7 +65,7 @@ function App() {
       const movies = await fetchMovies();
       setMovies(movies)
     } catch (err) {
-      handlePopupOpen(err);
+      handlePopupOpen({ code: err.errorCode, msg: err.errorMsg });
     } finally {
       setLoading(false);
     }
@@ -87,7 +87,7 @@ function App() {
         }
       }
     } catch (err) {
-      handlePopupOpen(err);
+      handlePopupOpen({ code: err.errorCode, msg: err.errorMsg });
     } finally {
       setLoading(false);
     }
@@ -125,7 +125,7 @@ function App() {
       await getUserSpecificData();
       navigate('/movies');
     } catch (err) {
-      handlePopupOpen(err);
+      handlePopupOpen({ code: err.errorCode, msg: err.errorMsg });
       navigate('/signup');
     } finally {
       setLoading(false);
@@ -142,7 +142,7 @@ function App() {
       await getUserSpecificData();
       navigate('/movies');
     } catch (err) {
-      handlePopupOpen(err);
+      handlePopupOpen({ code: err.errorCode, msg: err.errorMsg });
       navigate('/signin');
     } finally {
       setLoading(false);
@@ -162,9 +162,12 @@ function App() {
   const handleProfileUpdate = (name, email) => {
     setLoading(true);
     mainApi.updateProfile(name, email)
-      .then(res => setUser({ name: res.name, email: res.email }))
+      .then(res => {
+        setUser({ name: res.name, email: res.email });
+        handlePopupOpen({ code: 200, msg: 'Данные успешно изменены' });
+      })
       .catch(err => {
-        handlePopupOpen(err);
+        handlePopupOpen({ code: err.errorCode, msg: err.errorMsg });
       })
       .finally(() => { setLoading(false) })
   }
@@ -176,7 +179,7 @@ function App() {
       const newSavedMoovie = await mainApi.saveMovie(movie);
       setSavedMovies([...savedMovies, newSavedMoovie].sort((a, b) => a.movieId - b.movieId));
     } catch (err) {
-      handlePopupOpen(err)
+      handlePopupOpen({ code: err.errorCode, msg: err.errorMsg })
     }
   }
 
@@ -186,7 +189,7 @@ function App() {
       await mainApi.deleteMovie(_id);
       setSavedMovies(savedMovies.filter(savedMovie => savedMovie.movieId !== movie.movieId));
     } catch (err) {
-      handlePopupOpen(err)
+      handlePopupOpen({ code: err.errorCode, msg: err.errorMsg })
     }
   }
 
@@ -213,16 +216,16 @@ function App() {
 
   // Попап с ошибкой
 
-  const handlePopupOpen = (err) => {
+  const handlePopupOpen = (res) => {
     setPopupOpen(true);
-    setPopup(err);
+    setPopup(res);
   }
 
   const handlePopupClose = () => {
     setPopupOpen(false);
     setPopup({
-      errorCode: 0,
-      errorMsg: '',
+      code: 0,
+      msg: '',
     })
   }
 
@@ -387,7 +390,7 @@ function App() {
 
         {/* POPUPS */}
 
-        <InfoPopup isOpen={isPopupOpen} code={popup.errorCode} msg={`${popup.errorCode}. ${popup.errorMsg}`} handlePopupClose={handlePopupClose} />
+        <InfoPopup isOpen={isPopupOpen} code={popup.code} msg={`${popup.code}. ${popup.msg}`} handlePopupClose={handlePopupClose} />
 
       </div >
 
