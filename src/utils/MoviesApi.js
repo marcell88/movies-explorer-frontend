@@ -1,5 +1,4 @@
 import { SERVER_EXT_BASE_URL } from './server';
-import { SERVER_BASE_URL } from './server';
 
 class MoviesApi {
 

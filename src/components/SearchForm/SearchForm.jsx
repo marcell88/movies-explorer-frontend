@@ -1,5 +1,5 @@
 import React from 'react';
-import Input from '../Input/Input';
+import InputSearch from '../InputSearch/InputSearch';
 
 import { useFormAndValidation } from '../../hooks/useFormAndValidation';
 
@@ -7,24 +7,35 @@ import searchLabel from '../../images/search-label.svg';
 import searchButton from '../../images/search-button.svg';
 import './SearchForm.css';
 
-function SearchForm() {
+function SearchForm({ handleSearch, handleSearchFilter, handleSubmit, initialSearch, initialCheckbox }) {
 
-    // Hooks
+    const validation = useFormAndValidation();
+    const [request, setRequest] = React.useState('');
+    const [isShortOnly, setShortOnly] = React.useState(false);
+
+
+    // Validation
 
     React.useEffect(() => {
         validation.resetForm();
+        if (initialSearch) setRequest(initialSearch);
+        if (initialCheckbox) setShortOnly(initialCheckbox);
     }, []);
 
-    const validation = useFormAndValidation();
-
-    // Callbacks
     const onSubmit = (e) => {
         e.preventDefault();
-        console.log(e.target.find.value);
-        console.log(e.target.short.checked);
+        handleSubmit(request, isShortOnly);
     }
 
-    const handleChange = (e) => {
+    const handleRequestChange = (e) => {
+        setRequest(e.target.value);
+        handleSearch(e.target.value);
+        validation.handleChange(e);
+    }
+
+    const handleCheckboxChange = (e) => {
+        setShortOnly(e.target.checked);
+        handleSearchFilter(e.target.checked);
         validation.handleChange(e);
     }
 
@@ -39,12 +50,13 @@ function SearchForm() {
                         <img className='search__input-label-icon' src={searchLabel} alt='Искать' />
                     </label>
 
-                    <input
-                        className='search__input'
-                        onChange={handleChange}
+                    <InputSearch
+                        inputElement='search__input'
+                        value={request}
+                        onChange={handleRequestChange}
                         type='text'
                         name='find'
-                        required={true}
+                        id='input-find'
                         placeholder='Фильм'
                     />
 
@@ -56,7 +68,17 @@ function SearchForm() {
 
                 <fieldset className='search__checkbox-container'>
                     <label className='search__checkbox-label' htmlFor='short-checkbox'>Короткометражки
-                        <input type='checkbox' name='short' id='short-checkbox' className='search__checkbox' />
+
+                        <InputSearch
+                            inputElement='search__checkbox'
+                            value={isShortOnly}
+                            checked={isShortOnly}
+                            onChange={handleCheckboxChange}
+                            type='checkbox'
+                            name='short'
+                            id='short-checkbox'
+                        />
+
                         <span className='search__checkbox-border'></span>
                         <span className='search__checkbox-circle'></span>
                     </label>

@@ -13,7 +13,7 @@ import Movies from '../Movies/Movies';
 import Main from '../Main/Main'
 import Footer from '../Footer/Footer'
 import Header from '../Header/Header';
-import ProtectedRouteElement from '../ProtectedRouteElement/ProotectedRouteElement';
+import ProtectedRouteElement from '../ProtectedRouteElement/ProtectedRouteElement';
 
 import { CurrentUserContext } from '../../contexts/CurrentUserContext';
 
@@ -29,21 +29,17 @@ function App() {
 
   const [isLoggedIn, setLoggedIn] = React.useState(false);
   const [user, setUser] = React.useState({});
-
   const [isPopupOpen, setPopupOpen] = React.useState(false);
   const [popup, setPopup] = React.useState({});
-
   const [mainApi, setMainApi] = React.useState({});
-
   const [isLoading, setLoading] = React.useState(false);
-
   const [movies, setMovies] = React.useState([]);
-
   const [savedMovies, setSavedMovies] = React.useState([]);
-
   const [screenWidth, setScreenWidth] = React.useState(window.innerWidth);
   const [numberOfInitialMovies, setNumberOfInitialMovies] = React.useState(0);
   const [numberOfMoviesToAdd, setNumberOfMoviesToAdd] = React.useState(0);
+
+  const [isRedirectionActivated, setRedirectionActivated] = React.useState(false)
 
   // Скачиваем изначальные фильмы и данные пользователя
 
@@ -78,14 +74,14 @@ function App() {
   const getUserSpecificData = async () => {
     try {
       setLoading(true);
+      setRedirectionActivated(true);
       const jwt = localStorage.getItem('jwt');
       if (jwt) {
         const { user, mainApi } = await fetchUser(jwt);
-
         if (mainApi && user) {
-          setLoggedIn(true);
           setUser(user);
           setMainApi(mainApi);
+          setLoggedIn(true);
 
           const savedMovies = await fetchSavedMovies(mainApi);
           setSavedMovies(savedMovies);
@@ -139,6 +135,8 @@ function App() {
       setLoading(true);
       const { token } = await auth.authorization(password, email);
       localStorage.setItem('jwt', token);
+      localStorage.setItem('req', '');
+      localStorage.setItem('checkbox', 'all');
     } catch (err) {
       handlePopupOpen(err);
     } finally {
@@ -150,6 +148,9 @@ function App() {
 
   const handleLogout = () => {
     localStorage.removeItem('jwt');
+    localStorage.removeItem('req');
+    localStorage.removeItem('checkbox');
+
     setUser({});
     setLoggedIn(false);
     setMainApi({});
@@ -193,7 +194,20 @@ function App() {
 
   // Работа с поиском
 
+  const showOnlyShorts = (movies, checkbox) => {
+    return movies.filter(movie => checkbox ? movie.duration < 40 : true);
+  }
 
+  const showSearch = (movies, word) => {
+    return movies.filter(movie => {
+      return movie.country.toLowerCase().includes(word.toLowerCase()) ||
+        movie.director.toLowerCase().includes(word.toLowerCase()) ||
+        movie.year.toLowerCase().includes(word.toLowerCase()) ||
+        movie.description.toLowerCase().includes(word.toLowerCase()) ||
+        movie.nameRU.toLowerCase().includes(word.toLowerCase()) ||
+        movie.nameEN.toLowerCase().includes(word.toLowerCase());
+    });
+  }
 
   // Попап с ошибкой
 
@@ -250,6 +264,8 @@ function App() {
   }
 
   // Render
+
+  if (isLoading) return (<LoadingPopup isOpen={isLoading} />)
 
   return (
 
@@ -308,7 +324,10 @@ function App() {
           <Route path="/" element={<Main />} />
 
           <Route path="/movies" element={
-            <Movies
+            <ProtectedRouteElement
+              element={Movies}
+              isLoggedIn={isLoggedIn}
+              isRedirectionActivated={isRedirectionActivated}
               isLoading={isLoading}
               movies={movies}
               savedMovies={savedMovies}
@@ -317,22 +336,38 @@ function App() {
               numberOfMoviesToAdd={numberOfMoviesToAdd}
               handleSaveMovie={handleSaveMovie}
               handleDeleteMovie={handleDeleteMovie}
+
+              showOnlyShorts={showOnlyShorts}
+              showSearch={showSearch}
+              getAllMovies={getAllMovies}
             />
           } />
 
-          <Route path="/saved-movies" element={
-            <SavedMovies
-              isLoading={isLoading}
-              movies={movies}
-              savedMovies={savedMovies}
-              isMovieSaved={isMovieSaved}
-              numberOfInitialMovies={numberOfInitialMovies}
-              numberOfMoviesToAdd={numberOfMoviesToAdd}
-              handleDeleteMovie={handleDeleteMovie}
-            />
+          <Route path="/saved-movies" element={<ProtectedRouteElement
+            element={SavedMovies}
+            isLoggedIn={isLoggedIn}
+            isRedirectionActivated={isRedirectionActivated}
+            isLoading={isLoading}
+            movies={movies}
+            savedMovies={savedMovies}
+            isMovieSaved={isMovieSaved}
+            numberOfInitialMovies={numberOfInitialMovies}
+            numberOfMoviesToAdd={numberOfMoviesToAdd}
+            handleDeleteMovie={handleDeleteMovie}
+
+            showOnlyShorts={showOnlyShorts}
+            showSearch={showSearch}
+          />
           } />
 
-          <Route path="/profile" element={<Profile handleProfileUpdate={handleProfileUpdate} handleLogout={handleLogout} />} />
+          <Route path="/profile" element={<ProtectedRouteElement
+            element={Profile}
+            isLoggedIn={isLoggedIn}
+            isRedirectionActivated={isRedirectionActivated}
+            handleProfileUpdate={handleProfileUpdate}
+            handleLogout={handleLogout}
+          />} />
+
           <Route path="/signin" element={<SignIn goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} handleLogin={handleLogin} />} />
           <Route path="/signup" element={<SignUp goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} handleRegister={handleRegister} />} />
           <Route path="*" element={<PageNotFound goBack={goBack} />} />
@@ -351,8 +386,6 @@ function App() {
         {/* POPUPS */}
 
         <InfoPopup isOpen={isPopupOpen} code={popup.errorCode} msg={`${popup.errorCode}. ${popup.errorMsg}`} handlePopupClose={handlePopupClose} />
-
-        <LoadingPopup isOpen={isLoading} />
 
       </div >
 
