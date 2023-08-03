@@ -128,7 +128,13 @@ function App() {
       setLoading(false);
     }
     getUserSpecificData();
-    navigate('/');
+
+    if (isLoggedIn) {
+      navigate('/movies');
+    } else {
+      navigate('/signup');
+    }
+
   }
 
   const handleLogin = async (password, email) => {
@@ -144,7 +150,7 @@ function App() {
       setLoading(false);
     }
     getUserSpecificData();
-    navigate('/');
+    navigate('/movies');
   }
 
   const handleLogout = () => {
