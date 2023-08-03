@@ -122,19 +122,14 @@ function App() {
       localStorage.setItem('jwt', token);
       localStorage.setItem('req', '');
       localStorage.setItem('checkbox', 'all');
+      await getUserSpecificData();
+      navigate('/movies');
     } catch (err) {
       handlePopupOpen(err);
+      navigate('/signup');
     } finally {
       setLoading(false);
     }
-    getUserSpecificData();
-
-    if (isLoggedIn) {
-      navigate('/movies');
-    } else {
-      navigate('/signup');
-    }
-
   }
 
   const handleLogin = async (password, email) => {
@@ -144,13 +139,14 @@ function App() {
       localStorage.setItem('jwt', token);
       localStorage.setItem('req', '');
       localStorage.setItem('checkbox', 'all');
+      await getUserSpecificData();
+      navigate('/movies');
     } catch (err) {
       handlePopupOpen(err);
+      navigate('/signin');
     } finally {
       setLoading(false);
     }
-    getUserSpecificData();
-    navigate('/movies');
   }
 
   const handleLogout = () => {
