@@ -6,13 +6,6 @@ import './InfoPopup.css'
 
 function InfoPopup({ isOpen, code, msg, handlePopupClose, ...props }) {
 
-    React.useEffect(() => {
-        console.log(code);
-        console.log(msg);
-        console.log(props);
-
-    }, []);
-
     const isSuccess = code < 300;
     usePopupClose(isOpen, handlePopupClose);
 
