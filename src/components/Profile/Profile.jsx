@@ -13,6 +13,7 @@ function Profile({ handleProfileUpdate, handleLogout }) {
     const user = React.useContext(CurrentUserContext);
 
     // Hooks
+
     const [name, setName] = React.useState('');
     const [email, setEmail] = React.useState('');
     const validation = useFormAndValidation();
