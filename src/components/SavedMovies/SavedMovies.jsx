@@ -10,12 +10,22 @@ function SavedMovies({ movies, isLoading, savedMovies, isMovieSaved,
     const [moviesToRender, setMoviesToRender] = React.useState([]);
     const [isShortMoviesOnly, setIsShortMoviesOnly] = React.useState(false);
     const [request, setRequest] = React.useState('');
+    const [isEmpty, setEmpty] = React.useState(false);
+
 
     React.useEffect(() => {
         const newMoviesToRender = request === ''
             ? showOnlyShorts([...savedMovies], isShortMoviesOnly)
             : showOnlyShorts(showSearch(savedMovies, request), isShortMoviesOnly);
         setMoviesToRender(newMoviesToRender);
+
+        if (newMoviesToRender.length === 0) {
+            setEmpty(true);
+        }
+        else {
+            setEmpty(false);
+        }
+
     }, [savedMovies, request, isShortMoviesOnly]);
 
     const handleSearch = (req) => {
@@ -23,6 +33,7 @@ function SavedMovies({ movies, isLoading, savedMovies, isMovieSaved,
     }
 
     const handleSearchFilter = (checkbox) => {
+        console.log(checkbox);
         setIsShortMoviesOnly(checkbox);
     }
 
@@ -33,7 +44,12 @@ function SavedMovies({ movies, isLoading, savedMovies, isMovieSaved,
                 handleSearchFilter={handleSearchFilter}
                 handleSubmit={() => { }}
             />
-            {!isLoading && (<MoviesCardList
+
+            {isEmpty && (
+                <div className='movies__empty'>Ничего нет</div>
+            )}
+
+            <MoviesCardList
                 typeMovieButton='delete'
                 moviesToRender={moviesToRender}
 
@@ -44,7 +60,7 @@ function SavedMovies({ movies, isLoading, savedMovies, isMovieSaved,
                 savedMovies={savedMovies}
 
                 handleDeleteMovie={handleDeleteMovie}
-            />)}
+            />
         </main>
     );
 

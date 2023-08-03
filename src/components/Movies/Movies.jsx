@@ -10,14 +10,23 @@ function Movies({ isLoading, movies, savedMovies, isMovieSaved, numberOfInitialM
     const [moviesToRender, setMoviesToRender] = React.useState([]);
     const [isShortMoviesOnly, setIsShortMoviesOnly] = React.useState(false);
     const [request, setRequest] = React.useState('');
+    const [isEmpty, setEmpty] = React.useState(false);
 
     React.useEffect(() => {
         const req = localStorage.getItem('req');
-        const checkbox = localStorage.getItem('checkbox') !== 'all';
+        const checkbox = isShortMoviesOnly ? isShortMoviesOnly : localStorage.getItem('checkbox') !== 'all';
         const newMoviesToRender = req === ''
             ? showOnlyShorts([...movies], checkbox)
             : showOnlyShorts(showSearch(movies, req), checkbox);
         setMoviesToRender(newMoviesToRender);
+
+        if (newMoviesToRender.length === 0) {
+            setEmpty(true);
+        }
+        else {
+            setEmpty(false);
+        }
+
     }, [movies, request, isShortMoviesOnly]);
 
     const handleSubmit = async (req, checkbox) => {
@@ -28,16 +37,27 @@ function Movies({ isLoading, movies, savedMovies, isMovieSaved, numberOfInitialM
         localStorage.setItem('checkbox', checkbox ? 'short' : 'all');
     }
 
+    const handleSearchFilter = (checkbox) => {
+        setIsShortMoviesOnly(checkbox);
+    }
+
     return (
         <main className='movies'>
+
             <SearchForm
                 handleSearch={() => { }}
-                handleSearchFilter={() => { }}
+                handleSearchFilter={handleSearchFilter}
                 handleSubmit={handleSubmit}
                 initialSearch={localStorage.getItem('req')}
                 initialCheckbox={localStorage.getItem('checkbox') !== 'all'}
             />
-            {!isLoading && (<MoviesCardList
+
+            {isEmpty && (
+                <div className='movies__empty'>Ничего не найдено</div>
+            )}
+
+
+            <MoviesCardList
                 typeMovieButton='save'
                 moviesToRender={moviesToRender}
 
@@ -50,7 +70,8 @@ function Movies({ isLoading, movies, savedMovies, isMovieSaved, numberOfInitialM
                 handleSaveMovie={handleSaveMovie}
                 handleDeleteMovie={handleDeleteMovie}
 
-            />)}
+            />
+
 
         </main>
     );
