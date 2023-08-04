@@ -9,12 +9,13 @@ function Movies({ isLoading, movies, savedMovies, isMovieSaved, numberOfInitialM
 
     const [moviesToRender, setMoviesToRender] = React.useState([]);
     const [isShortMoviesOnly, setIsShortMoviesOnly] = React.useState(false);
+
     const [request, setRequest] = React.useState('');
     const [isEmpty, setEmpty] = React.useState(false);
 
     React.useEffect(() => {
         const req = localStorage.getItem('req');
-        const checkbox = isShortMoviesOnly ? isShortMoviesOnly : localStorage.getItem('checkbox') !== 'all';
+        const checkbox = localStorage.getItem('checkbox') !== 'all';
         const newMoviesToRender = req === ''
             ? showOnlyShorts([...movies], checkbox)
             : showOnlyShorts(showSearch(movies, req), checkbox);
@@ -26,6 +27,7 @@ function Movies({ isLoading, movies, savedMovies, isMovieSaved, numberOfInitialM
         else {
             setEmpty(false);
         }
+
     }, [movies, request, isShortMoviesOnly]);
 
     const handleSubmit = async (req, checkbox) => {
@@ -38,13 +40,19 @@ function Movies({ isLoading, movies, savedMovies, isMovieSaved, numberOfInitialM
 
     const handleSearchFilter = (checkbox) => {
         setIsShortMoviesOnly(checkbox);
+        localStorage.setItem('checkbox', checkbox ? 'short' : 'all');
+    }
+
+    const handleSearch = (req) => {
+        setRequest(req);
+        localStorage.setItem('req', req);
     }
 
     return (
         <main className='movies'>
 
             <SearchForm
-                handleSearch={() => { }}
+                handleSearch={handleSearch}
                 handleSearchFilter={handleSearchFilter}
                 handleSubmit={handleSubmit}
                 initialSearch={localStorage.getItem('req')}
