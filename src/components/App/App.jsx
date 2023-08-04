@@ -157,7 +157,7 @@ function App() {
     setUser({});
     setLoggedIn(false);
     setMainApi({});
-    navigate('/signin');
+    navigate('/');
   }
 
   const handleProfileUpdate = (name, email) => {
