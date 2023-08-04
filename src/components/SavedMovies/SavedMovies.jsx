@@ -33,7 +33,6 @@ function SavedMovies({ movies, isLoading, savedMovies, isMovieSaved,
     }
 
     const handleSearchFilter = (checkbox) => {
-        console.log(checkbox);
         setIsShortMoviesOnly(checkbox);
     }
 

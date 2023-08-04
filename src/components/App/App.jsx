@@ -121,7 +121,7 @@ function App() {
       const { token } = await auth.register(password, email, name);
       localStorage.setItem('jwt', token);
       localStorage.setItem('req', '');
-      localStorage.setItem('checkbox', 'all');
+      localStorage.setItem('checkbox', 'false');
       await getUserSpecificData();
       navigate('/movies');
     } catch (err) {
@@ -138,7 +138,7 @@ function App() {
       const { token } = await auth.authorization(password, email);
       localStorage.setItem('jwt', token);
       localStorage.setItem('req', '');
-      localStorage.setItem('checkbox', 'all');
+      localStorage.setItem('checkbox', 'false');
       await getUserSpecificData();
       navigate('/movies');
     } catch (err) {

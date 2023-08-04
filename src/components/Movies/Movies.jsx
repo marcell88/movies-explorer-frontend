@@ -8,26 +8,25 @@ function Movies({ isLoading, movies, savedMovies, isMovieSaved, numberOfInitialM
     numberOfMoviesToAdd, handleSaveMovie, handleDeleteMovie, showOnlyShorts, showSearch, getAllMovies }) {
 
     const [moviesToRender, setMoviesToRender] = React.useState([]);
-    const [isShortMoviesOnly, setIsShortMoviesOnly] = React.useState(false);
+    const [isShortMoviesOnly, setIsShortMoviesOnly] = React.useState(JSON.parse(localStorage.getItem('checkbox')));
 
     const [request, setRequest] = React.useState('');
     const [isEmpty, setEmpty] = React.useState(false);
 
     React.useEffect(() => {
+        console.log(isShortMoviesOnly);
         const req = localStorage.getItem('req');
-        const checkbox = localStorage.getItem('checkbox') !== 'all';
+        const checkbox = JSON.parse(localStorage.getItem('checkbox'));
         const newMoviesToRender = req === ''
             ? showOnlyShorts([...movies], checkbox)
             : showOnlyShorts(showSearch(movies, req), checkbox);
         setMoviesToRender(newMoviesToRender);
-
         if (newMoviesToRender.length === 0) {
             setEmpty(true);
         }
         else {
             setEmpty(false);
         }
-
     }, [movies, request, isShortMoviesOnly]);
 
     const handleSubmit = async (req, checkbox) => {
@@ -35,12 +34,12 @@ function Movies({ isLoading, movies, savedMovies, isMovieSaved, numberOfInitialM
         setRequest(req);
         setIsShortMoviesOnly(checkbox);
         localStorage.setItem('req', req);
-        localStorage.setItem('checkbox', checkbox ? 'short' : 'all');
+        localStorage.setItem('checkbox', checkbox ? 'true' : 'false');
     }
 
     const handleSearchFilter = (checkbox) => {
         setIsShortMoviesOnly(checkbox);
-        localStorage.setItem('checkbox', checkbox ? 'short' : 'all');
+        localStorage.setItem('checkbox', checkbox ? 'true' : 'false');
     }
 
     const handleSearch = (req) => {
@@ -56,7 +55,7 @@ function Movies({ isLoading, movies, savedMovies, isMovieSaved, numberOfInitialM
                 handleSearchFilter={handleSearchFilter}
                 handleSubmit={handleSubmit}
                 initialSearch={localStorage.getItem('req')}
-                initialCheckbox={localStorage.getItem('checkbox') !== 'all'}
+                initialCheckbox={JSON.parse(localStorage.getItem('checkbox'))}
             />
 
             {isEmpty && (
