@@ -1,6 +1,6 @@
 // Importing
-import React from 'react';
-import { Route, Routes, useNavigate } from 'react-router-dom';
+import React, { useLayoutEffect } from 'react';
+import { Route, Routes, Navigate, useNavigate, useLocation } from 'react-router-dom';
 
 import InfoPopup from '../InfoPopup/InfoPopup';
 import LoadingPopup from '../LoadingPopup/LoadingPopup';
@@ -39,7 +39,7 @@ function App() {
   const [numberOfInitialMovies, setNumberOfInitialMovies] = React.useState(0);
   const [numberOfMoviesToAdd, setNumberOfMoviesToAdd] = React.useState(0);
 
-  const [isRedirectionActivated, setRedirectionActivated] = React.useState(false)
+  const [isRedirectionActivated, setRedirectionActivated] = React.useState(false);
 
   // Скачиваем изначальные фильмы и данные пользователя
 
@@ -81,9 +81,9 @@ function App() {
           setUser(user);
           setMainApi(mainApi);
           setLoggedIn(true);
-          setRedirectionActivated(true);
           const savedMovies = await fetchSavedMovies(mainApi);
           setSavedMovies(savedMovies);
+          navigate(location.pathname);
         }
       }
     } catch (err) {
@@ -94,6 +94,7 @@ function App() {
   }
 
   React.useEffect(() => {
+    setRedirectionActivated(true);
     getAllMovies();
     getUserSpecificData();
   }, []);
@@ -232,6 +233,7 @@ function App() {
   // Navigation
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const goToLanding = (e) => {
     e.preventDefault();
@@ -373,8 +375,8 @@ function App() {
             handleLogout={handleLogout}
           />} />
 
-          <Route path="/signin" element={<SignIn goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} handleLogin={handleLogin} />} />
-          <Route path="/signup" element={<SignUp goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} handleRegister={handleRegister} />} />
+          <Route path="/signin" element={isLoggedIn ? <Navigate to='/profile' replace /> : <SignIn goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} handleLogin={handleLogin} />} />
+          <Route path="/signup" element={isLoggedIn ? <Navigate to='/profile' replace /> : <SignUp goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} handleRegister={handleRegister} />} />
           <Route path="*" element={<PageNotFound goBack={goBack} />} />
 
         </Routes>
