@@ -3,8 +3,16 @@ import { Navigate } from "react-router-dom";
 
 const ProtectedRouteElement = ({ element: Component, isLoggedIn, isRedirectionActivated, ...props }) => {
 
+    const [isInitialRender, setInitialRender] = React.useState(true);
+
+    React.useEffect(() => {
+        setInitialRender(false);
+    }, [isLoggedIn]);
+
     return (
-        (!isRedirectionActivated || isLoggedIn) ? <Component {...props} /> : <Navigate to="/" replace />
+        isInitialRender
+            ? <></>
+            : isLoggedIn ? <Component {...props} /> : <Navigate to='/' replace />
     )
 }
 

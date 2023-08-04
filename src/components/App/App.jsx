@@ -1,5 +1,5 @@
 // Importing
-import React, { useLayoutEffect } from 'react';
+import React from 'react';
 import { Route, Routes, Navigate, useNavigate, useLocation } from 'react-router-dom';
 
 import InfoPopup from '../InfoPopup/InfoPopup';
@@ -38,8 +38,6 @@ function App() {
   const [screenWidth, setScreenWidth] = React.useState(window.innerWidth);
   const [numberOfInitialMovies, setNumberOfInitialMovies] = React.useState(0);
   const [numberOfMoviesToAdd, setNumberOfMoviesToAdd] = React.useState(0);
-
-  const [isRedirectionActivated, setRedirectionActivated] = React.useState(false);
 
   // Скачиваем изначальные фильмы и данные пользователя
 
@@ -94,7 +92,6 @@ function App() {
   }
 
   React.useEffect(() => {
-    setRedirectionActivated(true);
     getAllMovies();
     getUserSpecificData();
   }, []);
@@ -334,7 +331,6 @@ function App() {
             <ProtectedRouteElement
               element={Movies}
               isLoggedIn={isLoggedIn}
-              isRedirectionActivated={isRedirectionActivated}
               isLoading={isLoading}
               movies={movies}
               savedMovies={savedMovies}
@@ -353,7 +349,6 @@ function App() {
           <Route path="/saved-movies" element={<ProtectedRouteElement
             element={SavedMovies}
             isLoggedIn={isLoggedIn}
-            isRedirectionActivated={isRedirectionActivated}
             isLoading={isLoading}
             movies={movies}
             savedMovies={savedMovies}
@@ -370,7 +365,6 @@ function App() {
           <Route path="/profile" element={<ProtectedRouteElement
             element={Profile}
             isLoggedIn={isLoggedIn}
-            isRedirectionActivated={isRedirectionActivated}
             handleProfileUpdate={handleProfileUpdate}
             handleLogout={handleLogout}
           />} />

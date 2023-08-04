@@ -14,7 +14,6 @@ function Movies({ isLoading, movies, savedMovies, isMovieSaved, numberOfInitialM
     const [isEmpty, setEmpty] = React.useState(false);
 
     React.useEffect(() => {
-        console.log(isShortMoviesOnly);
         const req = localStorage.getItem('req');
         const checkbox = JSON.parse(localStorage.getItem('checkbox'));
         const newMoviesToRender = req === ''
