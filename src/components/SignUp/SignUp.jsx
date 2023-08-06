@@ -8,17 +8,20 @@ import { emailRegExp } from '../../utils/constants';
 import './SignUp.css';
 import logoPath from '../../images/logo.svg';
 
-function SignUp({ isLoading, goToLanding, goToLogin, goToRegistration, handleRegister }) {
+function SignUp({ signUpInitialValues, isLoading, goToLanding, goToLogin, goToRegistration, handleRegister }) {
 
     const validation = useFormAndValidation();
-    const [pass, setPass] = React.useState('');
-    const [email, setEmail] = React.useState('');
-    const [name, setName] = React.useState('');
+    const [pass, setPass] = React.useState(signUpInitialValues.pass);
+    const [email, setEmail] = React.useState(signUpInitialValues.email);
+    const [name, setName] = React.useState(signUpInitialValues.name);
 
     // Hooks
 
     React.useEffect(() => {
         validation.resetForm();
+        setPass(signUpInitialValues.pass);
+        setEmail(signUpInitialValues.email);
+        setName(signUpInitialValues.name);
     }, []);
 
     React.useEffect(() => {

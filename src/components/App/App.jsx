@@ -39,6 +39,9 @@ function App() {
   const [numberOfInitialMovies, setNumberOfInitialMovies] = React.useState(0);
   const [numberOfMoviesToAdd, setNumberOfMoviesToAdd] = React.useState(0);
 
+  const [signInInitialValues, setSignInInitialValues] = React.useState({ email: '', pass: '' });
+  const [signUpInitialValues, setSignUpInitialValues] = React.useState({ email: '', pass: '', name: '' });
+
   // Скачиваем изначальные фильмы и данные пользователя
 
   const fetchMovies = async () => {
@@ -121,10 +124,13 @@ function App() {
       localStorage.setItem('req', '');
       localStorage.setItem('checkbox', 'false');
       await getUserSpecificData();
+      setSignUpInitialValues({ pass: '', email: '', name: '' });
+      setSignInInitialValues({ pass: '', email: '' });
       navigate('/movies');
     } catch (err) {
       handlePopupOpen({ code: err.errorCode, msg: err.errorMsg });
       navigate('/signup');
+      setSignUpInitialValues({ pass: '', email, name })
     } finally {
       setLoading(false);
     }
@@ -138,10 +144,13 @@ function App() {
       localStorage.setItem('req', '');
       localStorage.setItem('checkbox', 'false');
       await getUserSpecificData();
+      setSignUpInitialValues({ pass: '', email: '', name: '' });
+      setSignInInitialValues({ pass: '', email: '' });
       navigate('/movies');
     } catch (err) {
       handlePopupOpen({ code: err.errorCode, msg: err.errorMsg });
       navigate('/signin');
+      setSignInInitialValues({ pass: '', email });
     } finally {
       setLoading(false);
     }
@@ -370,8 +379,8 @@ function App() {
             handleLogout={handleLogout}
           />} />
 
-          <Route path="/signin" element={isLoggedIn ? <Navigate to='/profile' replace /> : <SignIn isLoading={isLoading} goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} handleLogin={handleLogin} />} />
-          <Route path="/signup" element={isLoggedIn ? <Navigate to='/profile' replace /> : <SignUp isLoading={isLoading} goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} handleRegister={handleRegister} />} />
+          <Route path="/signin" element={isLoggedIn ? <Navigate to='/profile' replace /> : <SignIn signInInitialValues={signInInitialValues} isLoading={isLoading} goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} handleLogin={handleLogin} />} />
+          <Route path="/signup" element={isLoggedIn ? <Navigate to='/profile' replace /> : <SignUp signUpInitialValues={signUpInitialValues} isLoading={isLoading} goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} handleRegister={handleRegister} />} />
           <Route path="*" element={<PageNotFound goBack={goBack} />} />
 
         </Routes>

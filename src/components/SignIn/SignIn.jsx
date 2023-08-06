@@ -7,7 +7,7 @@ import { emailRegExp } from '../../utils/constants';
 import './SignIn.css';
 import logoPath from '../../images/logo.svg';
 
-function SignIn({ isLoading, goToLanding, goToLogin, goToRegistration, handleLogin }) {
+function SignIn({ signInInitialValues, isLoading, goToLanding, goToLogin, goToRegistration, handleLogin }) {
 
     const validation = useFormAndValidation();
     const [pass, setPass] = React.useState('');
@@ -17,6 +17,8 @@ function SignIn({ isLoading, goToLanding, goToLogin, goToRegistration, handleLog
 
     React.useEffect(() => {
         validation.resetForm();
+        setPass(signInInitialValues.pass);
+        setEmail(signInInitialValues.email);
     }, []);
 
     React.useEffect(() => {
