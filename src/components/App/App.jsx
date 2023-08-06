@@ -16,6 +16,7 @@ import Header from '../Header/Header';
 import ProtectedRouteElement from '../ProtectedRouteElement/ProtectedRouteElement';
 
 import { CurrentUserContext } from '../../contexts/CurrentUserContext';
+import { SHORT_MOVIE_MAX_DURATION, INITIAL_NUMBER_OF_CARDS, ADDITINAL_NUMBER_OF_CARDS } from '../../utils/constants'
 
 import moviesApi from '../../utils/MoviesApi';
 import MainApi from '../../utils/MainApi';
@@ -110,8 +111,21 @@ function App() {
   });
 
   React.useEffect(() => {
-    setNumberOfInitialMovies(screenWidth > 1100 ? 12 : (screenWidth > 740 ? 8 : 5));
-    setNumberOfMoviesToAdd(screenWidth > 1100 ? 3 : 2);
+
+    setNumberOfInitialMovies(screenWidth > INITIAL_NUMBER_OF_CARDS[0].minWidth
+      ? INITIAL_NUMBER_OF_CARDS[0].number
+      : (screenWidth > INITIAL_NUMBER_OF_CARDS[1].minWidth
+        ? INITIAL_NUMBER_OF_CARDS[1].number
+        : INITIAL_NUMBER_OF_CARDS[2].number)
+    );
+
+    setNumberOfMoviesToAdd(screenWidth > ADDITINAL_NUMBER_OF_CARDS[0].minWidth
+      ? ADDITINAL_NUMBER_OF_CARDS[0].number
+      : (screenWidth > ADDITINAL_NUMBER_OF_CARDS[1].minWidth
+        ? ADDITINAL_NUMBER_OF_CARDS[1].number
+        : ADDITINAL_NUMBER_OF_CARDS[2].number)
+    );
+
   }, [screenWidth]);
 
   // Работа с пользователем
@@ -207,7 +221,7 @@ function App() {
   // Работа с поиском
 
   const showOnlyShorts = (movies, checkbox) => {
-    return movies.filter(movie => checkbox ? movie.duration < 40 : true);
+    return movies.filter(movie => checkbox ? movie.duration < SHORT_MOVIE_MAX_DURATION : true);
   }
 
   const showSearch = (movies, word) => {
