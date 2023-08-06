@@ -8,7 +8,7 @@ import { emailRegExp } from '../../utils/constants';
 import './SignUp.css';
 import logoPath from '../../images/logo.svg';
 
-function SignUp({ goToLanding, goToLogin, goToRegistration, handleRegister }) {
+function SignUp({ isLoading, goToLanding, goToLogin, goToRegistration, handleRegister }) {
 
     const validation = useFormAndValidation();
     const [pass, setPass] = React.useState('');
@@ -21,6 +21,13 @@ function SignUp({ goToLanding, goToLogin, goToRegistration, handleRegister }) {
         validation.resetForm();
     }, []);
 
+    React.useEffect(() => {
+        if (isLoading) {
+            validation.resetForm(false);
+        } else {
+            validation.resetForm(true);
+        }
+    }, [isLoading])
 
     //Callbacks
 
@@ -78,6 +85,7 @@ function SignUp({ goToLanding, goToLogin, goToRegistration, handleRegister }) {
                         placeholder='Введите имя'
                         minLength='2'
                         maxLength='30'
+                        disabled={isLoading}
                         required
                     />
 
@@ -97,6 +105,7 @@ function SignUp({ goToLanding, goToLogin, goToRegistration, handleRegister }) {
                         id='input-email'
                         placeholder='Введите почту'
                         pattern={emailRegExp}
+                        disabled={isLoading}
                         required
                     />
 
@@ -117,6 +126,7 @@ function SignUp({ goToLanding, goToLogin, goToRegistration, handleRegister }) {
                         placeholder='Введите пароль'
                         minLength='6'
                         maxLength='30'
+                        disabled={isLoading}
                         required
                     />
 

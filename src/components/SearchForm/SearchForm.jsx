@@ -7,7 +7,7 @@ import searchLabel from '../../images/search-label.svg';
 import searchButton from '../../images/search-button.svg';
 import './SearchForm.css';
 
-function SearchForm({ handleSearch, handleSearchFilter, handleSubmit, initialSearch, initialCheckbox }) {
+function SearchForm({ isLoading, handleSearch, handleSearchFilter, handleSubmit, initialSearch, initialCheckbox }) {
 
     const validation = useFormAndValidation();
     const [request, setRequest] = React.useState('');
@@ -26,6 +26,15 @@ function SearchForm({ handleSearch, handleSearchFilter, handleSubmit, initialSea
         e.preventDefault();
         handleSubmit(request, isShortOnly);
     }
+
+    React.useEffect(() => {
+        if (isLoading) {
+            validation.resetForm(false);
+        } else {
+            validation.resetForm(true);
+        }
+    }, [isLoading])
+
 
     const handleRequestChange = (e) => {
         setRequest(e.target.value);
@@ -58,6 +67,7 @@ function SearchForm({ handleSearch, handleSearchFilter, handleSubmit, initialSea
                         name='find'
                         id='input-find'
                         placeholder='Фильм'
+                        disabled={isLoading}
                     />
 
                     <button className='search__button' type='submit' disabled={!validation.isValid}>
@@ -77,6 +87,7 @@ function SearchForm({ handleSearch, handleSearchFilter, handleSubmit, initialSea
                             type='checkbox'
                             name='short'
                             id='short-checkbox'
+                            disabled={isLoading}
                         />
 
                         <span className='search__checkbox-border'></span>

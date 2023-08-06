@@ -8,7 +8,7 @@ import { emailRegExp } from '../../utils/constants';
 
 import './Profile.css';
 
-function Profile({ handleProfileUpdate, handleLogout }) {
+function Profile({ handleProfileUpdate, handleLogout, isLoading }) {
 
     const user = React.useContext(CurrentUserContext);
 
@@ -23,12 +23,12 @@ function Profile({ handleProfileUpdate, handleLogout }) {
             setName(user.name);
             setEmail(user.email);
         }
-        validation.resetForm();
+        validation.resetForm(false);
     }, [user]);
 
     React.useEffect(() => {
         if (user.name === name && user.email === email) {
-            validation.resetForm();
+            validation.resetForm(false);
         }
     }, [name, email]);
 
@@ -36,6 +36,7 @@ function Profile({ handleProfileUpdate, handleLogout }) {
 
     const edit = (e) => {
         e.preventDefault();
+        validation.resetForm(false);
         handleProfileUpdate(name, email);
     }
 
@@ -79,6 +80,7 @@ function Profile({ handleProfileUpdate, handleLogout }) {
                     placeholder='Введите имя'
                     minLength='2'
                     maxLength='30'
+                    disabled={isLoading}
                     required
                 />
 
@@ -98,6 +100,7 @@ function Profile({ handleProfileUpdate, handleLogout }) {
                     id='input-email'
                     placeholder='Введите почту'
                     pattern={emailRegExp}
+                    disabled={isLoading}
                     required
                 />
 

@@ -51,6 +51,7 @@ function Movies({ isLoading, movies, savedMovies, isMovieSaved, numberOfInitialM
 
             <SearchForm
                 handleSearch={handleSearch}
+                isLoading={isLoading}
                 handleSearchFilter={handleSearchFilter}
                 handleSubmit={handleSubmit}
                 initialSearch={localStorage.getItem('req')}

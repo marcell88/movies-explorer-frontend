@@ -14,6 +14,7 @@ function InputSearch({ inputElement, inputErrorModificator, labelElement, labelT
             placeholder={stdInputProps.placeholder}
             required={stdInputProps.required}
             checked={stdInputProps.checked}
+            disabled={stdInputProps.disabled}
         />
     )
 

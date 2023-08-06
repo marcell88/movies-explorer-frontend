@@ -365,12 +365,13 @@ function App() {
           <Route path="/profile" element={<ProtectedRouteElement
             element={Profile}
             isLoggedIn={isLoggedIn}
+            isLoading={isLoading}
             handleProfileUpdate={handleProfileUpdate}
             handleLogout={handleLogout}
           />} />
 
-          <Route path="/signin" element={isLoggedIn ? <Navigate to='/profile' replace /> : <SignIn goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} handleLogin={handleLogin} />} />
-          <Route path="/signup" element={isLoggedIn ? <Navigate to='/profile' replace /> : <SignUp goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} handleRegister={handleRegister} />} />
+          <Route path="/signin" element={isLoggedIn ? <Navigate to='/profile' replace /> : <SignIn isLoading={isLoading} goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} handleLogin={handleLogin} />} />
+          <Route path="/signup" element={isLoggedIn ? <Navigate to='/profile' replace /> : <SignUp isLoading={isLoading} goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} handleRegister={handleRegister} />} />
           <Route path="*" element={<PageNotFound goBack={goBack} />} />
 
         </Routes>
