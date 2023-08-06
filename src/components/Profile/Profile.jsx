@@ -23,8 +23,14 @@ function Profile({ handleProfileUpdate, handleLogout }) {
             setName(user.name);
             setEmail(user.email);
         }
-        validation.resetForm(true);
+        validation.resetForm();
     }, [user]);
+
+    React.useEffect(() => {
+        if (user.name === name && user.email === email) {
+            validation.resetForm();
+        }
+    }, [name, email]);
 
     //Callbacks
 

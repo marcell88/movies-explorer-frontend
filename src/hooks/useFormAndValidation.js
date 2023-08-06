@@ -19,11 +19,8 @@ export function useFormAndValidation() {
 
     //reset form validation
     const resetForm = React.useCallback((newIsValid = false, newValues = {}, newErrors = {}, newErrorFlags = {}) => {
-        setValues(newValues);
-        setErrors(newErrors);
         setIsValid(newIsValid);
-        setErrorFlags(newErrorFlags);
-    }, [setValues, setErrors, setIsValid, setErrorFlags]);
+    }, [setIsValid]);
 
     return { values, errors, errorFlags, isValid, handleChange, resetForm, setValues, setErrorFlags, setIsValid };
 
