@@ -2,30 +2,48 @@ import React from 'react';
 import Input from '../Input/Input';
 
 import { useFormAndValidation } from '../../hooks/useFormAndValidation';
+import { emailRegExp } from '../../utils/constants';
 
 import './SignIn.css';
 import logoPath from '../../images/logo.svg';
 
-function SignIn({ goToLanding, goToLogin, goToRegistration }) {
+function SignIn({ signInInitialValues, isLoading, goToLanding, goToLogin, goToRegistration, handleLogin }) {
 
     const validation = useFormAndValidation();
+    const [pass, setPass] = React.useState('');
+    const [email, setEmail] = React.useState('');
 
     // Hooks
 
     React.useEffect(() => {
         validation.resetForm();
+        setPass(signInInitialValues.pass);
+        setEmail(signInInitialValues.email);
     }, []);
 
+    React.useEffect(() => {
+        if (isLoading) {
+            validation.resetForm(false);
+        } else {
+            validation.resetForm(true);
+        }
+    }, [isLoading])
 
     //Callbacks
 
     const signin = (e) => {
         e.preventDefault();
-        console.log('signin');
+        handleLogin(pass, email);
     }
 
-    const handleChange = (e) => {
-        validation.handleChange(e);
+    const handleEmailChange = (evt) => {
+        setEmail(evt.target.value);
+        validation.handleChange(evt);
+    }
+
+    const handlePassChange = (evt) => {
+        setPass(evt.target.value);
+        validation.handleChange(evt);
     }
 
     // Render
@@ -51,15 +69,17 @@ function SignIn({ goToLanding, goToLogin, goToRegistration }) {
                         labelElement='signin__label'
                         labelText='E-mail'
                         errorElement='signin__error'
-                        defaultValue=''
+                        value={email}
                         isFormValid={validation.isValid}
                         isInputValid={validation.errorFlags['email'] || validation.errorFlags['email'] === undefined}
                         errorText={validation.errors['email']}
-                        onChange={handleChange}
+                        onChange={handleEmailChange}
                         type='email'
                         name='email'
                         id='input-email'
                         placeholder='Введите почту'
+                        pattern={emailRegExp}
+                        disabled={isLoading}
                         required
                     />
 
@@ -69,17 +89,18 @@ function SignIn({ goToLanding, goToLogin, goToRegistration }) {
                         labelElement='signin__label'
                         labelText='Пароль'
                         errorElement='signin__error'
-                        defaultValue=''
+                        value={pass}
                         isFormValid={validation.isValid}
                         isInputValid={validation.errorFlags['password'] || validation.errorFlags['password'] === undefined}
                         errorText={validation.errors['password']}
-                        onChange={handleChange}
+                        onChange={handlePassChange}
                         type='password'
                         name='password'
                         id='input-pass'
                         placeholder='Введите пароль'
                         minLength='6'
                         maxLength='30'
+                        disabled={isLoading}
                         required
                     />
 

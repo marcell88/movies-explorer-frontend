@@ -1,32 +1,65 @@
 import React from 'react';
 import SearchForm from '../SearchForm/SearchForm';
-import Preloader from '../Preloader/Preloader';
 import MoviesCardList from '../MoviesCardList/MoviesCardList';
 
 import './SavedMovies.css';
 
-function SavedMovies({ movies, isLoading, savedMovies, isMovieSaved }) {
+function SavedMovies({ movies, isLoading, savedMovies, isMovieSaved,
+    numberOfInitialMovies, numberOfMoviesToAdd, handleDeleteMovie, showOnlyShorts, showSearch }) {
 
-    // Render
+    const [moviesToRender, setMoviesToRender] = React.useState([]);
+    const [isShortMoviesOnly, setIsShortMoviesOnly] = React.useState(false);
+    const [request, setRequest] = React.useState('');
+    const [isEmpty, setEmpty] = React.useState(false);
+
+
+    React.useEffect(() => {
+        const newMoviesToRender = request === ''
+            ? showOnlyShorts([...savedMovies], isShortMoviesOnly)
+            : showOnlyShorts(showSearch(savedMovies, request), isShortMoviesOnly);
+        setMoviesToRender(newMoviesToRender);
+
+        if (newMoviesToRender.length === 0) {
+            setEmpty(true);
+        }
+        else {
+            setEmpty(false);
+        }
+
+    }, [savedMovies, request, isShortMoviesOnly]);
+
+    const handleSearch = (req) => {
+        setRequest(req);
+    }
+
+    const handleSearchFilter = (checkbox) => {
+        setIsShortMoviesOnly(checkbox);
+    }
 
     return (
         <main className='movies'>
-            <SearchForm />
+            <SearchForm
+                handleSearch={handleSearch}
+                handleSearchFilter={handleSearchFilter}
+                handleSubmit={() => { }}
+            />
 
-            {isLoading
-                ? (<Preloader />)
-                : (<MoviesCardList
-                    typeMovieButton='delete'
-                    moviesToRender={savedMovies}
+            {isEmpty && (
+                <div className='movies__empty'>Ничего нет</div>
+            )}
 
-                    numberOfInitialMovies={12}
-                    numberOfMoviesToAdd={6}
+            <MoviesCardList
+                typeMovieButton='delete'
+                moviesToRender={moviesToRender}
 
-                    isMovieSaved={isMovieSaved}
-                    savedMovies={savedMovies}
-                />)
-            }
+                numberOfInitialMovies={numberOfInitialMovies}
+                numberOfMoviesToAdd={numberOfMoviesToAdd}
 
+                isMovieSaved={isMovieSaved}
+                savedMovies={savedMovies}
+
+                handleDeleteMovie={handleDeleteMovie}
+            />
         </main>
     );
 

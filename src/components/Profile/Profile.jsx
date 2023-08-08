@@ -1,38 +1,58 @@
 import React from 'react';
 
 import Input from '../Input/Input';
-
 import { useFormAndValidation } from '../../hooks/useFormAndValidation';
-import { TranslationContext } from '../../utils/user';
+import { CurrentUserContext } from '../../contexts/CurrentUserContext';
+
+import { emailRegExp } from '../../utils/constants';
 
 import './Profile.css';
 
-function Profile() {
+function Profile({ handleProfileUpdate, handleLogout, isLoading }) {
 
-    const user = React.useContext(TranslationContext);
-    const validation = useFormAndValidation();
+    const user = React.useContext(CurrentUserContext);
 
     // Hooks
 
-    React.useEffect(() => {
-        validation.resetForm(true);
-    }, []);
+    const [name, setName] = React.useState('');
+    const [email, setEmail] = React.useState('');
+    const validation = useFormAndValidation();
 
+    React.useEffect(() => {
+        if (user.name && user.email) {
+            setName(user.name);
+            setEmail(user.email);
+        }
+        validation.resetForm(false);
+    }, [user]);
+
+    React.useEffect(() => {
+        if (user.name === name && user.email === email) {
+            validation.resetForm(false);
+        }
+    }, [name, email]);
 
     //Callbacks
 
     const edit = (e) => {
         e.preventDefault();
-        console.log('edit');
+        validation.resetForm(false);
+        handleProfileUpdate(name, email);
     }
 
     const logout = (e) => {
         e.preventDefault();
-        console.log('logout');
+        handleLogout();
     }
 
-    const handleChange = (e) => {
-        validation.handleChange(e);
+    const handleNameChange = (evt) => {
+        setName(evt.target.value);
+        validation.handleChange(evt);
+    }
+
+    const handleEmailChange = (evt) => {
+        setEmail(evt.target.value);
+        validation.handleChange(evt);
     }
 
     // Render
@@ -41,7 +61,7 @@ function Profile() {
         <main className='profile'>
             <form className='profile__form' noValidate onSubmit={edit}>
 
-                <h1 className='profile__title'>Привет, {user.name}!</h1>
+                <h1 className='profile__title'>Привет, {name}!</h1>
 
                 <Input
                     inputElement='profile__input'
@@ -49,17 +69,18 @@ function Profile() {
                     labelElement='profile__label'
                     errorElement='profile__error'
                     labelText='Имя'
-                    defaultValue={user.name}
+                    value={name}
                     isFormValid={validation.isValid}
                     isInputValid={validation.errorFlags['name'] || validation.errorFlags['name'] === undefined}
                     errorText={validation.errors['name']}
-                    onChange={handleChange}
+                    onChange={handleNameChange}
                     type='text'
                     name='name'
                     id='input-name'
                     placeholder='Введите имя'
                     minLength='2'
                     maxLength='30'
+                    disabled={isLoading}
                     required
                 />
 
@@ -69,15 +90,17 @@ function Profile() {
                     labelElement='profile__label'
                     labelText='E-mail'
                     errorElement='profile__error'
-                    defaultValue={user.email}
+                    value={email}
                     isFormValid={validation.isValid}
                     isInputValid={validation.errorFlags['email'] || validation.errorFlags['email'] === undefined}
                     errorText={validation.errors['email']}
-                    onChange={handleChange}
+                    onChange={handleEmailChange}
                     type='email'
                     name='email'
                     id='input-email'
                     placeholder='Введите почту'
+                    pattern={emailRegExp}
+                    disabled={isLoading}
                     required
                 />
 

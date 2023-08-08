@@ -19,6 +19,8 @@ function Input({ inputElement, inputErrorModificator, labelElement, labelText, e
                 required={stdInputProps.required}
                 minLength={stdInputProps.minLength}
                 maxLength={stdInputProps.maxLength}
+                pattern={stdInputProps.pattern}
+                disabled={stdInputProps.disabled}
             />
             <span className={`${errorElement} ${!validity ? `${errorElement}_visible` : ''}`}>{errorText}</span>
         </label>

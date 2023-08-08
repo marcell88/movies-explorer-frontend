@@ -1,51 +1,106 @@
 // Importing
 import React from 'react';
-import { Route, Routes, useNavigate } from 'react-router-dom';
+import { Route, Routes, Navigate, useNavigate, useLocation } from 'react-router-dom';
 
-import InfoPopup from '../InfoPopup/InfoPopup'
-
+import InfoPopup from '../InfoPopup/InfoPopup';
+import LoadingPopup from '../LoadingPopup/LoadingPopup';
 import SignIn from '../SignIn/SignIn';
 import SignUp from '../SignUp/SignUp';
 import Profile from '../Profile/Profile';
 import PageNotFound from '../PageNotFound/PageNotFound';
-
 import SavedMovies from '../SavedMovies/SavedMovies'
 import Movies from '../Movies/Movies';
-
 import Main from '../Main/Main'
 import Footer from '../Footer/Footer'
 import Header from '../Header/Header';
+import ProtectedRouteElement from '../ProtectedRouteElement/ProtectedRouteElement';
 
-import api from '../../utils/api';
-import { user, TranslationContext } from '../../utils/user';
+import { CurrentUserContext } from '../../contexts/CurrentUserContext';
+import { SHORT_MOVIE_MAX_DURATION, INITIAL_NUMBER_OF_CARDS, ADDITINAL_NUMBER_OF_CARDS } from '../../utils/constants'
+
+import moviesApi from '../../utils/MoviesApi';
+import MainApi from '../../utils/MainApi';
+import * as auth from '../../utils/auth';
 
 import './App.css';
 
 function App() {
 
-  // Hooks
+  // Стейтс
 
   const [isLoggedIn, setLoggedIn] = React.useState(false);
-
+  const [user, setUser] = React.useState({});
   const [isPopupOpen, setPopupOpen] = React.useState(false);
+  const [popup, setPopup] = React.useState({});
+  const [mainApi, setMainApi] = React.useState({});
   const [isLoading, setLoading] = React.useState(false);
   const [movies, setMovies] = React.useState([]);
   const [savedMovies, setSavedMovies] = React.useState([]);
-
   const [screenWidth, setScreenWidth] = React.useState(window.innerWidth);
   const [numberOfInitialMovies, setNumberOfInitialMovies] = React.useState(0);
   const [numberOfMoviesToAdd, setNumberOfMoviesToAdd] = React.useState(0);
 
+  const [signInInitialValues, setSignInInitialValues] = React.useState({ email: '', pass: '' });
+  const [signUpInitialValues, setSignUpInitialValues] = React.useState({ email: '', pass: '', name: '' });
+
+  // Скачиваем изначальные фильмы и данные пользователя
+
+  const fetchMovies = async () => {
+    const movies = await moviesApi.getAllMovies();
+    return movies;
+  }
+
+  const fetchUser = async (jwt) => {
+    const user = await auth.checkToken(jwt);
+    const mainApi = new MainApi(jwt);
+    return { user, mainApi };
+  }
+
+  const fetchSavedMovies = async (mainApi) => {
+    const savedMovies = await mainApi.getAllSavedMovies();
+    return savedMovies;
+  }
+
+  const getAllMovies = async () => {
+    try {
+      setLoading(true);
+      const movies = await fetchMovies();
+      setMovies(movies)
+    } catch (err) {
+      handlePopupOpen({ code: err.errorCode, msg: err.errorMsg });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const getUserSpecificData = async () => {
+    try {
+      setLoading(true);
+      const jwt = localStorage.getItem('jwt');
+      if (jwt) {
+        const { user, mainApi } = await fetchUser(jwt);
+        if (mainApi && user) {
+          setUser(user);
+          setMainApi(mainApi);
+          setLoggedIn(true);
+          const savedMovies = await fetchSavedMovies(mainApi);
+          setSavedMovies(savedMovies);
+          navigate(location.pathname);
+        }
+      }
+    } catch (err) {
+      handlePopupOpen({ code: err.errorCode, msg: err.errorMsg });
+    } finally {
+      setLoading(false);
+    }
+  }
+
   React.useEffect(() => {
-    setLoading(true);
-    api.getInitialCards()
-      .then(movies => {
-        setMovies(movies);
-        setSavedMovies(movies.filter((item, index) => index < 5)); // Для верстки считаем первые 5 филдьом - залайканы
-      })
-      .catch(err => { console.log(err) })
-      .finally(() => { setLoading(false) });
+    getAllMovies();
+    getUserSpecificData();
   }, []);
+
+  // Слушаем размер экрана
 
   React.useEffect(() => {
     const handleResize = () => {
@@ -56,19 +111,149 @@ function App() {
   });
 
   React.useEffect(() => {
-    setNumberOfInitialMovies(screenWidth > 1100 ? 12 : (screenWidth > 740 ? 8 : 5));
-    setNumberOfMoviesToAdd(screenWidth > 1100 ? 3 : 2);
+
+    setNumberOfInitialMovies(screenWidth > INITIAL_NUMBER_OF_CARDS[0].minWidth
+      ? INITIAL_NUMBER_OF_CARDS[0].number
+      : (screenWidth > INITIAL_NUMBER_OF_CARDS[1].minWidth
+        ? INITIAL_NUMBER_OF_CARDS[1].number
+        : INITIAL_NUMBER_OF_CARDS[2].number)
+    );
+
+    setNumberOfMoviesToAdd(screenWidth > ADDITINAL_NUMBER_OF_CARDS[0].minWidth
+      ? ADDITINAL_NUMBER_OF_CARDS[0].number
+      : (screenWidth > ADDITINAL_NUMBER_OF_CARDS[1].minWidth
+        ? ADDITINAL_NUMBER_OF_CARDS[1].number
+        : ADDITINAL_NUMBER_OF_CARDS[2].number)
+    );
+
   }, [screenWidth]);
 
-  // Callbacks
+  // Работа с пользователем
+
+  const handleRegister = async (password, email, name) => {
+    try {
+      setLoading(true);
+      const { token } = await auth.register(password, email, name);
+      localStorage.setItem('jwt', token);
+      localStorage.setItem('req', '');
+      localStorage.setItem('checkbox', 'false');
+      await getUserSpecificData();
+      setSignUpInitialValues({ pass: '', email: '', name: '' });
+      setSignInInitialValues({ pass: '', email: '' });
+      navigate('/movies');
+    } catch (err) {
+      handlePopupOpen({ code: err.errorCode, msg: err.errorMsg });
+      navigate('/signup');
+      setSignUpInitialValues({ pass: '', email, name })
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleLogin = async (password, email) => {
+    try {
+      setLoading(true);
+      const { token } = await auth.authorization(password, email);
+      localStorage.setItem('jwt', token);
+      localStorage.setItem('req', '');
+      localStorage.setItem('checkbox', 'false');
+      await getUserSpecificData();
+      setSignUpInitialValues({ pass: '', email: '', name: '' });
+      setSignInInitialValues({ pass: '', email: '' });
+      navigate('/movies');
+    } catch (err) {
+      handlePopupOpen({ code: err.errorCode, msg: err.errorMsg });
+      navigate('/signin');
+      setSignInInitialValues({ pass: '', email });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('jwt');
+    localStorage.removeItem('req');
+    localStorage.removeItem('checkbox');
+    setUser({});
+    setLoggedIn(false);
+    setMainApi({});
+    navigate('/');
+  }
+
+  const handleProfileUpdate = (name, email) => {
+    setLoading(true);
+    mainApi.updateProfile(name, email)
+      .then(res => {
+        setUser({ name: res.name, email: res.email });
+        handlePopupOpen({ code: 200, msg: 'Данные успешно изменены' });
+      })
+      .catch(err => {
+        handlePopupOpen({ code: err.errorCode, msg: err.errorMsg });
+      })
+      .finally(() => { setLoading(false) })
+  }
+
+  // Работа с фильмами
+
+  const handleSaveMovie = async (movie) => {
+    try {
+      const newSavedMoovie = await mainApi.saveMovie(movie);
+      setSavedMovies([...savedMovies, newSavedMoovie].sort((a, b) => a.movieId - b.movieId));
+    } catch (err) {
+      handlePopupOpen({ code: err.errorCode, msg: err.errorMsg })
+    }
+  }
+
+  const handleDeleteMovie = async (movie) => {
+    const _id = savedMovies.find(savedMovie => savedMovie.movieId === movie.movieId)._id;
+    try {
+      await mainApi.deleteMovie(_id);
+      setSavedMovies(savedMovies.filter(savedMovie => savedMovie.movieId !== movie.movieId));
+    } catch (err) {
+      handlePopupOpen({ code: err.errorCode, msg: err.errorMsg })
+    }
+  }
 
   const isMovieSaved = (savedMovies, movie) => {
     return savedMovies.filter(item => item.movieId === movie.movieId).length !== 0;
   }
 
+  // Работа с поиском
+
+  const showOnlyShorts = (movies, checkbox) => {
+    return movies.filter(movie => checkbox ? movie.duration < SHORT_MOVIE_MAX_DURATION : true);
+  }
+
+  const showSearch = (movies, word) => {
+    return movies.filter(movie => {
+      return movie.country.toLowerCase().includes(word.toLowerCase()) ||
+        movie.director.toLowerCase().includes(word.toLowerCase()) ||
+        movie.year.toLowerCase().includes(word.toLowerCase()) ||
+        movie.description.toLowerCase().includes(word.toLowerCase()) ||
+        movie.nameRU.toLowerCase().includes(word.toLowerCase()) ||
+        movie.nameEN.toLowerCase().includes(word.toLowerCase());
+    });
+  }
+
+  // Попап с ошибкой
+
+  const handlePopupOpen = (res) => {
+    setPopupOpen(true);
+    setPopup(res);
+  }
+
+  const handlePopupClose = () => {
+    setPopupOpen(false);
+    setPopup({
+      code: 0,
+      msg: '',
+    })
+  }
+
   // Navigation
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const goToLanding = (e) => {
     e.preventDefault();
@@ -107,9 +292,11 @@ function App() {
 
   // Render
 
+  if (isLoading) return (<LoadingPopup isOpen={isLoading} />)
+
   return (
 
-    <TranslationContext.Provider value={user}>
+    <CurrentUserContext.Provider value={user}>
 
       <div className="page">
 
@@ -164,30 +351,50 @@ function App() {
           <Route path="/" element={<Main />} />
 
           <Route path="/movies" element={
-            <Movies
-              movies={movies}
+            <ProtectedRouteElement
+              element={Movies}
+              isLoggedIn={isLoggedIn}
               isLoading={isLoading}
+              movies={movies}
               savedMovies={savedMovies}
               isMovieSaved={isMovieSaved}
               numberOfInitialMovies={numberOfInitialMovies}
               numberOfMoviesToAdd={numberOfMoviesToAdd}
+              handleSaveMovie={handleSaveMovie}
+              handleDeleteMovie={handleDeleteMovie}
+
+              showOnlyShorts={showOnlyShorts}
+              showSearch={showSearch}
+              getAllMovies={getAllMovies}
             />
           } />
 
-          <Route path="/saved-movies" element={
-            <SavedMovies
-              movies={movies}
-              isLoading={isLoading}
-              savedMovies={savedMovies}
-              isMovieSaved={isMovieSaved}
-              numberOfInitialMovies={numberOfInitialMovies}
-              numberOfMoviesToAdd={numberOfMoviesToAdd}
-            />
+          <Route path="/saved-movies" element={<ProtectedRouteElement
+            element={SavedMovies}
+            isLoggedIn={isLoggedIn}
+            isLoading={isLoading}
+            movies={movies}
+            savedMovies={savedMovies}
+            isMovieSaved={isMovieSaved}
+            numberOfInitialMovies={numberOfInitialMovies}
+            numberOfMoviesToAdd={numberOfMoviesToAdd}
+            handleDeleteMovie={handleDeleteMovie}
+
+            showOnlyShorts={showOnlyShorts}
+            showSearch={showSearch}
+          />
           } />
 
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/signin" element={<SignIn goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} />} />
-          <Route path="/signup" element={<SignUp goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} />} />
+          <Route path="/profile" element={<ProtectedRouteElement
+            element={Profile}
+            isLoggedIn={isLoggedIn}
+            isLoading={isLoading}
+            handleProfileUpdate={handleProfileUpdate}
+            handleLogout={handleLogout}
+          />} />
+
+          <Route path="/signin" element={isLoggedIn ? <Navigate to='/profile' replace /> : <SignIn signInInitialValues={signInInitialValues} isLoading={isLoading} goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} handleLogin={handleLogin} />} />
+          <Route path="/signup" element={isLoggedIn ? <Navigate to='/profile' replace /> : <SignUp signUpInitialValues={signUpInitialValues} isLoading={isLoading} goToLanding={goToLanding} goToLogin={goToLogin} goToRegistration={goToRegistration} handleRegister={handleRegister} />} />
           <Route path="*" element={<PageNotFound goBack={goBack} />} />
 
         </Routes>
@@ -203,11 +410,11 @@ function App() {
 
         {/* POPUPS */}
 
-        <InfoPopup isOpen={isPopupOpen} code={401} msg='Forbidden' />
+        <InfoPopup isOpen={isPopupOpen} code={popup.code} msg={`${popup.code}. ${popup.msg}`} handlePopupClose={handlePopupClose} />
 
-      </div>
+      </div >
 
-    </TranslationContext.Provider  >
+    </CurrentUserContext.Provider >
   );
 }
 

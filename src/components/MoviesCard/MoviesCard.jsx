@@ -1,11 +1,16 @@
 import React from 'react';
 import './MoviesCard.css';
 
-function MoviesCard({ typeMovieButton, movie, isSaved }) {
+function MoviesCard({ typeMovieButton, movie, isSaved, handleSaveMovie, handleDeleteMovie }) {
 
     // Hooks
 
-    const [isActive, setActive] = React.useState(isSaved);
+    const [isActive, setActive] = React.useState(false);
+    const [isUpdating, setUpdating] = React.useState(false);
+
+    React.useEffect(() => {
+        setActive(isSaved);
+    }, [isSaved]);
 
     // Callbacks
 
@@ -16,20 +21,27 @@ function MoviesCard({ typeMovieButton, movie, isSaved }) {
     }
 
     const setButtonClass = () => {
-
-        // if typeMovieButton - delete
-        if (typeMovieButton === 'delete') {
-            return 'card__delete';
-        }
-
-        // if typeMovieButton - select
-        return `card__save ${isActive && 'card__save_active'}`;
+        const modificatorIsCardSelected = `${isActive && 'card__save_active'}`;
+        const modificatorIsCardUpdating = `${isUpdating && 'card-updating'}`;
+        return typeMovieButton === 'delete' ? 'card__delete ' + modificatorIsCardUpdating : 'card__save' + ' ' + modificatorIsCardSelected + ' ' + modificatorIsCardUpdating;
     }
 
-    const onClick = (e) => {
+    const saveCard = async (e) => {
         e.preventDefault();
+        setUpdating(true);
         setActive(!isActive);
         setButtonClass();
+        await handleSaveMovie(movie);
+        setUpdating(false);
+    }
+
+    const deleteCard = async (e) => {
+        e.preventDefault();
+        setUpdating(true);
+        setActive(!isActive);
+        setButtonClass();
+        await handleDeleteMovie(movie);
+        setUpdating(false);
     }
 
     return (
@@ -39,7 +51,7 @@ function MoviesCard({ typeMovieButton, movie, isSaved }) {
                     <h2 className='card__title'>{movie.nameRU}</h2>
                     <p className='card__duration'>{durationToString(movie.duration)}</p>
                 </div>
-                <button className={setButtonClass()} type='button' onClick={onClick}></button>
+                <button className={setButtonClass()} type='button' onClick={isSaved ? deleteCard : saveCard}></button>
             </div>
             <a className='card__link' href={movie.trailerLink} target='_blank' rel="noreferrer"><img className='card__image' src={movie.image} alt={movie.nameRU} /></a>
         </div>

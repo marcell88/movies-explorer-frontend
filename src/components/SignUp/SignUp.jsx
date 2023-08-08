@@ -2,30 +2,56 @@ import React from 'react';
 import Input from '../Input/Input';
 
 import { useFormAndValidation } from '../../hooks/useFormAndValidation';
+import { emailRegExp } from '../../utils/constants';
+
 
 import './SignUp.css';
 import logoPath from '../../images/logo.svg';
 
-function SignUp({ goToLanding, goToLogin, goToRegistration }) {
+function SignUp({ signUpInitialValues, isLoading, goToLanding, goToLogin, goToRegistration, handleRegister }) {
 
     const validation = useFormAndValidation();
+    const [pass, setPass] = React.useState(signUpInitialValues.pass);
+    const [email, setEmail] = React.useState(signUpInitialValues.email);
+    const [name, setName] = React.useState(signUpInitialValues.name);
 
     // Hooks
 
     React.useEffect(() => {
         validation.resetForm();
+        setPass(signUpInitialValues.pass);
+        setEmail(signUpInitialValues.email);
+        setName(signUpInitialValues.name);
     }, []);
 
+    React.useEffect(() => {
+        if (isLoading) {
+            validation.resetForm(false);
+        } else {
+            validation.resetForm(true);
+        }
+    }, [isLoading])
 
     //Callbacks
 
     const signup = (e) => {
         e.preventDefault();
-        console.log('signup');
+        handleRegister(pass, email, name);
     }
 
-    const handleChange = (e) => {
-        validation.handleChange(e);
+    const handleEmailChange = (evt) => {
+        setEmail(evt.target.value);
+        validation.handleChange(evt);
+    }
+
+    const handlePassChange = (evt) => {
+        setPass(evt.target.value);
+        validation.handleChange(evt);
+    }
+
+    const handleNameChange = (evt) => {
+        setName(evt.target.value);
+        validation.handleChange(evt);
     }
 
     // Render
@@ -51,17 +77,18 @@ function SignUp({ goToLanding, goToLogin, goToRegistration }) {
                         labelElement='signup__label'
                         errorElement='signup__error'
                         labelText='Имя'
-                        defaultValue=''
+                        value={name}
                         isFormValid={validation.isValid}
                         isInputValid={validation.errorFlags['name'] || validation.errorFlags['name'] === undefined}
                         errorText={validation.errors['name']}
-                        onChange={handleChange}
+                        onChange={handleNameChange}
                         type='text'
                         name='name'
                         id='input-name'
                         placeholder='Введите имя'
                         minLength='2'
                         maxLength='30'
+                        disabled={isLoading}
                         required
                     />
 
@@ -71,15 +98,17 @@ function SignUp({ goToLanding, goToLogin, goToRegistration }) {
                         labelElement='signup__label'
                         labelText='E-mail'
                         errorElement='signup__error'
-                        defaultValue=''
+                        value={email}
                         isFormValid={validation.isValid}
                         isInputValid={validation.errorFlags['email'] || validation.errorFlags['email'] === undefined}
                         errorText={validation.errors['email']}
-                        onChange={handleChange}
+                        onChange={handleEmailChange}
                         type='email'
                         name='email'
                         id='input-email'
                         placeholder='Введите почту'
+                        pattern={emailRegExp}
+                        disabled={isLoading}
                         required
                     />
 
@@ -89,15 +118,18 @@ function SignUp({ goToLanding, goToLogin, goToRegistration }) {
                         labelElement='signup__label'
                         labelText='Пароль'
                         errorElement='signup__error'
-                        defaultValue=''
+                        value={pass}
                         isFormValid={validation.isValid}
                         isInputValid={validation.errorFlags['password'] || validation.errorFlags['password'] === undefined}
                         errorText={validation.errors['password']}
-                        onChange={handleChange}
+                        onChange={handlePassChange}
                         type='password'
                         name='password'
                         id='input-pass'
                         placeholder='Введите пароль'
+                        minLength='6'
+                        maxLength='30'
+                        disabled={isLoading}
                         required
                     />
 

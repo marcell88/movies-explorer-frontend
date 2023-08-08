@@ -6,6 +6,7 @@ import App from './components/App/App';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 document.documentElement.lang = 'ru';
+document.title = 'Проект the Movies';
 root.render(
   <BrowserRouter><App /></BrowserRouter>
 );
